@@ -1,0 +1,322 @@
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+body {
+    font-family: 'Roboto', sans-serif;
+}
+/* Header Styles */
+/* Căn chỉnh chung cho header */
+/* Căn chỉnh chung cho header */
+header {
+    display: flex;
+    align-items: flex-start; /* Logo và nội dung thẳng hàng phía trên */
+    justify-content: space-between;
+    color: black;
+    border-bottom: 2px solid #ad171c;
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Logo */
+header img.logo {
+    max-width: 300px;
+    height: auto;
+    margin-right: 20px; /* Khoảng cách giữa logo và nội dung */
+}
+
+/* Nội dung bên phải */
+header .content {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    width: 100%;
+}
+
+/* Tiêu đề */
+header .title {
+    font-size: 25px;
+    margin-bottom: 15px; /* Khoảng cách giữa tiêu đề và các nút */
+    text-align: center; /* Căn trái tiêu đề */
+}
+/* Thanh ngăn cách */
+.divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 20px;
+    padding: 0px 20px;
+    height: 2px;
+    width: 600px;
+    background-color: white;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background-color: #ad171c; /* Màu sắc của đường thẳng */
+    margin: 0 10px;
+}
+
+.divider i {
+    color: #ad171c;
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+/* Container cho các nút */
+header .buttons-container {
+    display: flex;
+    gap: 10px; /* Khoảng cách giữa các nút */
+    flex-wrap: wrap; /* Cho phép nút xuống dòng khi màn hình nhỏ */
+}
+
+header .buttons-container button {
+    background-color: #f4f4f4;
+    color: #ad171c;
+    border: 2px solid #ad171c;
+    border-radius: 5px;
+    padding: 10px 2px;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100px; /* Kích thước cố định của nút */
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+}
+
+header .buttons-container button:hover {
+    background-color: #ad171c;
+    color: #fff;
+}
+
+
+/* ----------------------   */
+
+h3{
+    padding-left: 75px;
+    margin: 20px auto;
+    
+}
+/* Logo Styles */
+.logo {
+    margin-left: 20px;
+    height: auto;
+    width: 300px; /* Tăng kích thước logo ngang */
+}
+
+/* Title Styles */
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+    color:#ad171c;
+}
+
+/* General Table Styles */
+table {
+    border-collapse: collapse;
+    width: 90%;  /* Giảm kích thước bảng */
+    margin: 30px auto;
+
+}
+
+/* Header Styles for Table */
+th {
+    background-color: #ad171c;
+    color: white;
+    padding: 10px;  /* Tăng padding cho header */
+    text-align: center;
+    font-size: 14px;  /* Tăng font-size của tiêu đề */
+    border: 2px solid #ddd; /* Tăng độ đậm của border */
+}
+
+/* Cell Styles */
+td {
+    border: 2px solid #ddd;  /* Tăng độ đậm của border */
+    padding: 8px;  /* Tăng padding cho các ô */
+    text-align: center;
+    font-size: 12px;  /* Tăng font-size cho các ô */
+}
+
+td[rowspan], th[rowspan] {
+    vertical-align: middle;
+}
+
+td[colspan] {
+    text-align: center;
+    font-weight: bold;
+    background-color: #f9f9f9;
+}
+
+/* Hover effect */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Styling for the header row (standard title) */
+.standard-header td {
+    background-color: #f2f2f2;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    padding: 14px;
+    border: none;
+}
+
+/* Custom styles for borders and spacing */
+table, th, td {
+    border: 2px solid #ddd;  /* Tăng độ đậm của border */
+    border-radius: 5px;
+}
+
+/* Apply alternate row coloring for better readability */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+/* Add spacing between multiple tables */
+#tables-container {
+    margin-top: 20px;
+}
+
+/* Align criteria cells to the top */
+td.criteria, th.criteria {
+    vertical-align: top; /* Align to the top */
+    text-align: left; /* Align text to the left */
+    font-size: 16px;  /* Tăng font-size cho Tiêu chí */
+    font-weight: bold;
+}
+
+/* Giảm kích thước cột 'Tên minh chứng' */
+th:nth-child(5), td:nth-child(5) {
+    width: 350px;  /* Giảm độ rộng của cột 'Tên minh chứng' */
+    padding: 8px 10px;  /* Tăng padding */
+}
+/* Giảm cột 'Nơi ban hành hoặc nhóm, cá nhân thực hiện' */
+th:nth-child(7), td:nth-child(7) {
+    width: 100px;
+    padding: 8px 10px;  /* Tăng padding */
+}
+th:nth-child(4), td:nth-child(4) {
+    width: 70px;  
+    padding: 8px 10px;  /* Tăng padding */
+    font-size: 14px;  /* Điều chỉnh font-size */
+}
+/* Tăng chiều rộng cho cột 'Tiêu chí' */
+th:nth-child(1), td:nth-child(1) {
+    width: 100px;
+    padding: 10px 14px;  /* Tăng padding */
+}
+
+/* Nút phân trang */
+#pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#pagination button {
+    margin: 0 5px;
+    padding: 5px 20px;
+    border: none; 
+    background-color: #ad171c;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#pagination button.active {
+
+    font-weight: bold;
+    outline: 3px solid #ad171c; 
+    color: #ad171c;
+    background-color: white;
+}
+
+#pagination button:disabled {
+
+    outline: 3px solid #ad171c; 
+    color: #ad171c;
+    background-color: rgba(0, 0, 0, 0.147);
+}
+
+.btn{
+    color: #ad171c;
+    font-size: 16px;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; /* Optional: Adjust space between header and content */
+}
+
+.header-left {
+    flex: 1;
+}
+
+.header-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding-right: 100px; /* Thêm padding bên phải để tránh sát lề */
+}
+
+.header-right label {
+    margin-right: 5px;
+}
+
+.header-right select, .header-right button {
+    margin-right: 10px;
+}
+.header-right button {
+    font-size: 12px; /* Tăng kích thước chữ */
+    padding: 10px 20px; /* Tăng kích thước padding để nút lớn hơn */
+    margin-left: 10px; /* Khoảng cách giữa các nút */
+    border-radius: 5px; /* Làm tròn góc cho nút */
+    cursor: pointer; /* Thêm con trỏ chuột khi hover */
+    transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu nền khi hover */
+}
+
+.header-right button:hover {
+    background-color: #ad171c;
+    color: #fff;
+}
+
+.header-right select {
+    font-size: 12px; /* Tăng kích thước chữ trong combobox */
+    padding: 10px 20px; /* Tăng padding để combobox lớn hơn */
+    margin-left: 10px; /* Khoảng cách giữa các combobox */
+    border-radius: 5px; /* Làm tròn góc cho combobox */
+    width: 200px; /* Điều chỉnh chiều rộng của combobox */
+    cursor: pointer; /* Thêm con trỏ chuột khi hover */
+    transition: border-color 0.3s ease; /* Hiệu ứng chuyển màu viền khi hover */
+}
+
+.header-right select:focus {
+    border-color: #007bff; /* Màu viền khi combobox được chọn */
+}
+
+
+.button_filter{
+    background-color: #f4f4f4;
+    color: #ad171c;
+    border: 2px solid #ad171c;
+    border-radius: 5px;
+    padding: 10px 2px;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100px; /* Kích thước cố định của nút */
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+}

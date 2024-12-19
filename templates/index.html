@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDU - QLCTDTN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icon-logo.png') }}">
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <img class="logo" src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo Trường Đại học Bình Dương">
+        <div class="content">
+            <div class="title">Quản lý chương trình đào tạo ngành</div>
+            <div class="divider">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div class="buttons-container">
+                <button>Khoa CNTT</button>
+                <button>Khoa Kinh tế</button>
+                <button>Khoa Luật</button>
+                <button>Khoa Logistic</button>
+                <button>Khoa Dược</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="header-container">
+        <div class="header-left">
+            <h3><i class="fa-solid fa-bars"></i> Danh mục minh chứng</h3>
+        </div>
+    
+        <div class="header-right">
+            <!-- Dropdown Tiêu chuẩn -->
+            <label for="ma_tieu_chuan">Chức năng tìm kiếm:</label>
+            <select id="ma_tieu_chuan">
+                <option value="">-- Chọn tiêu chuẩn --</option>
+                <!-- Options sẽ được populate từ dữ liệu -->
+            </select>
+    
+            <!-- Dropdown Tiêu chí (ẩn mặc định) -->
+            <label for="ma_tieu_chi" style="display: none;">Mã tiêu chí:</label>
+            <select id="ma_tieu_chi" style="display: none;">
+                <option value="">-- Chọn tiêu chí --</option>
+            </select>
+    
+            <!-- Nút Lọc và Bỏ lọc -->
+            <button id="filter-btn" class="button_filter">Lọc</button>
+            <button id="reset-filter-btn" style="display: none;" class="button_filter">Bỏ lọc</button>
+        </div>
+    </div>
+    
+
+
+
+    <div id="tables-container"></div> <!-- Mảng bảng sẽ được chèn vào đây -->
+
+    <div id="pagination"></div> <!-- Container cho các nút phân trang -->
+
+    <script>
+        // Truyền dữ liệu từ Flask sang JavaScript dưới dạng JSON hợp lệ
+        let data = {{ data | tojson | safe }};
+        populateDropdown(data);
+        let currentPage = 1; // Trang hiện tại
+        const itemsPerPage = 1; // Số lượng tiêu chuẩn hiển thị trên mỗi trang
+
+        renderPage(data);
+
+        function renderPage(data) {
+
+            const container = document.querySelector('#tables-container');
+            const pagination = document.querySelector('#pagination');
+            container.innerHTML = ''; // Xóa nội dung hiện tại
+            pagination.innerHTML = ''; // Xóa các nút phân trang hiện tại
+
+            // Tính toán dữ liệu cho trang hiện tại
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentItems = data.slice(startIndex, endIndex);
+
+            // Hiển thị các tiêu chuẩn trong trang hiện tại
+            currentItems.forEach(item => {
+                renderTables([item]); // Gọi hàm renderTables cho từng item
+            });
+
+            // Hiển thị nút phân trang
+            renderPagination(data);
+
+            window.scrollTo(0, 0); // Cuộn lên đầu trang
+        }
+
+        function renderPagination(data) {
+            const pagination = document.querySelector('#pagination');
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+
+            // Nút Previous
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Trước';
+            prevButton.disabled = currentPage === 1; // Vô hiệu hóa nếu đang ở trang đầu
+            prevButton.addEventListener('click', () => {
+                currentPage--;
+                renderPage(data);
+            });
+            pagination.appendChild(prevButton);
+
+            // Nút số trang
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+
+
+                pageButton.textContent = i;
+                pageButton.classList.toggle('active', i === currentPage); // Đánh dấu trang hiện tại
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    renderPage(data);
+                });
+                pagination.appendChild(pageButton);
+            }
+
+            // Nút Next
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Sau';
+            nextButton.disabled = currentPage === totalPages; // Vô hiệu hóa nếu đang ở trang cuối
+            nextButton.addEventListener('click', () => {
+                currentPage++;
+                renderPage(data);
+            });
+            pagination.appendChild(nextButton);
+        }
+
+        function renderTables(data) {
+            const container = document.querySelector('#tables-container');
+            data.forEach(tieuChuan => {
+                const table = document.createElement('table');
+                table.classList.add('table', 'table-bordered', 'table-striped');
+
+                // Dòng tiêu đề của bảng (các cột)
+                const titleRow = document.createElement('tr');
+                titleRow.innerHTML = `
+            <th>Tiêu chí</th>
+            <th>Số TT</th>
+            <th>Mã minh chứng</th>
+            <th>Minh chứng con</th>
+            <th>Tên minh chứng</th>
+            <th>Số, ngày ban hành, hoặc thời điểm khảo sát, điều tra, phỏng vấn, quan sát,…</th>
+            <th>Nơi ban hành hoặc nhóm, cá nhân thực hiện</th>
+            <th>Link</th>
+        `;
+                table.appendChild(titleRow);
+
+                // Dòng hiển thị tiêu chuẩn (title)
+                const headerRow = document.createElement('tr');
+                const headerCell = document.createElement('td');
+                headerCell.setAttribute('colspan', '8');
+                headerCell.textContent = tieuChuan.ten_tieu_chuan;  // Hiển thị tiêu đề từ JSON
+                headerCell.style.fontSize = '18px';
+                headerCell.style.fontWeight = 'bold';
+                headerRow.appendChild(headerCell);
+                table.appendChild(headerRow);
+
+                // Kiểm tra nếu tieuChis tồn tại và là mảng
+                if (Array.isArray(tieuChuan.tieu_chis)) {
+                    tieuChuan.tieu_chis.forEach(tieuChi => {
+                        const tieuChiRow = document.createElement('tr');
+                        const totalRowspan = tieuChi.minh_chungs?.reduce((total, item) => {
+                            return total + (item.minh_chung_cons ? item.minh_chung_cons.length : 1);
+                        }, 1) || 1;
+
+                        const tieuChiCell = document.createElement('td');
+                        tieuChiCell.setAttribute('rowspan', totalRowspan);
+                        tieuChiCell.textContent = tieuChi.ma_tieu_chi;
+                        tieuChiCell.classList.add('criteria');
+                        tieuChiRow.appendChild(tieuChiCell);
+
+                        const moTaCell = document.createElement('td');
+                        moTaCell.setAttribute('colspan', '7');
+                        moTaCell.textContent = tieuChi.mo_ta;
+                        moTaCell.style.textAlign = 'left';
+                        moTaCell.style.fontSize = '16px';
+                        tieuChiRow.appendChild(moTaCell);
+                        table.appendChild(tieuChiRow);
+
+                        // Kiểm tra nếu minhChungs tồn tại và là mảng
+                        if (Array.isArray(tieuChi.minh_chungs)) {
+                            tieuChi.minh_chungs.forEach(minhChung => {
+                                if (minhChung.minh_chung_cons) {
+                                    minhChung.minh_chung_cons.forEach((minhChungCon, index) => {
+                                        const minhChungConRow = document.createElement('tr');
+                                        if (index === 0) {
+                                            const sttCell = document.createElement('td');
+                                            const minhChungConCodeCell = document.createElement('td');
+                                            sttCell.rowSpan = minhChung.minh_chung_cons.length;
+                                            minhChungConCodeCell.rowSpan = minhChung.minh_chung_cons.length;
+                                            sttCell.textContent = minhChung.so_thu_tu;
+                                            minhChungConCodeCell.textContent = minhChung.ma_minh_chung;
+                                            minhChungConRow.appendChild(sttCell);
+                                            minhChungConRow.appendChild(minhChungConCodeCell);
+                                        }
+                                        minhChungConRow.innerHTML += `
+                                    <td>${minhChungCon.so_minh_chung}</td>
+                                    <td style="font-size: 12px; text-align: start;">${minhChungCon.ten_minh_chung}</td>
+                                    <td style="width: 150px;">${minhChungCon.ngay_ban_hanh}</td>
+                                    <td style="font-size: 12px;">${minhChungCon.noi_ban_hanh}</td>
+                                    <td style="width: 100px;">
+                                        ${minhChungCon.link ? `<a href="${minhChungCon.link}" target="_blank" class="btn">
+                                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                        </a>` : ''} 
+                                    </td>
+                                `;
+                                        table.appendChild(minhChungConRow);
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+                container.appendChild(table);
+            });
+        }
+
+        function filterMinhChung(data, ma_tieu_chuan, ma_tieu_chi) {
+            if(!ma_tieu_chuan){
+                return;
+            }
+
+            filteredData = data; // Bắt đầu từ dữ liệu gốc
+
+            if (ma_tieu_chuan) {
+                filteredData = filteredData.filter(tieuChuan => tieuChuan.ma_tieu_chuan == ma_tieu_chuan);
+            }
+
+            if (ma_tieu_chi) {
+                filteredData = filteredData.map(tieuChuan => {
+                    return {
+                        ...tieuChuan,
+                        tieu_chis: tieuChuan.tieu_chis.filter(tieuChi => tieuChi.ma_tieu_chi == ma_tieu_chi)
+                    };
+                }).filter(tieuChuan => tieuChuan.tieu_chis.length > 0);
+            }
+
+            document.getElementById('reset-filter-btn').style.display = 'inline-block';
+            currentPage = 1; // Reset về trang đầu tiên khi lọc
+            renderPage(filteredData);
+        }
+
+
+
+        function resetFilter() {
+            document.getElementById('ma_tieu_chuan').value = "";
+            document.getElementById('ma_tieu_chi').value = "";
+            document.getElementById('ma_tieu_chi').style.display = 'none'; // Ẩn dropdown tiêu chí
+
+            document.getElementById('reset-filter-btn').style.display = 'none';
+            filteredData = data; // Khôi phục dữ liệu gốc
+            currentPage = 1; // Reset về trang đầu tiên
+            renderPage(filteredData);
+        }
+
+
+        // Hàm để tạo danh sách các mã tiêu chuẩn trong dropdown
+        function populateDropdown(data) {
+            const select = document.getElementById('ma_tieu_chuan');
+            const uniqueMaTieuChuan = [...new Set(data.map(item => item.ma_tieu_chuan))];  // Lấy danh sách các mã tiêu chuẩn duy nhất
+
+            // Thêm các option vào select
+            uniqueMaTieuChuan.forEach(maTieuChuan => {
+                const option = document.createElement('option');
+                option.value = maTieuChuan;
+                option.textContent = maTieuChuan;
+                select.appendChild(option);
+            });
+        }
+
+        function populateDropdownTieuChi(maTieuChuan) {
+            const tieuChiDropdown = document.getElementById('ma_tieu_chi');
+            tieuChiDropdown.innerHTML = '<option value="">-- Chọn tiêu chí --</option>'; // Reset dropdown
+
+            if (!maTieuChuan) {
+                tieuChiDropdown.style.display = 'none'; // Ẩn dropdown nếu không có tiêu chuẩn
+                return;
+            }
+
+            // Lọc dữ liệu tieu_chis dựa trên maTieuChuan
+            const selectedTieuChuan = data.find(tieuChuan => tieuChuan.ma_tieu_chuan == maTieuChuan);
+            if (selectedTieuChuan && Array.isArray(selectedTieuChuan.tieu_chis)) {
+                selectedTieuChuan.tieu_chis.forEach(tieuChi => {
+                    const option = document.createElement('option');
+                    option.value = tieuChi.ma_tieu_chi;
+                    option.textContent = tieuChi.ma_tieu_chi;
+                    tieuChiDropdown.appendChild(option);
+                });
+            }
+
+            tieuChiDropdown.style.display = 'inline-block'; // Hiển thị dropdown tiêu chí
+        }
+
+        document.getElementById('ma_tieu_chuan').addEventListener('change', function () {
+            const selectedTieuChuan = this.value;
+            populateDropdownTieuChi(selectedTieuChuan);
+        });
+
+        document.getElementById('filter-btn').addEventListener('click', function () {
+            const maTieuChuan = document.getElementById('ma_tieu_chuan').value;
+            const maTieuChi = document.getElementById('ma_tieu_chi').value;
+
+            // Gọi hàm filterMinhChung với các giá trị lọc
+            filterMinhChung(data, maTieuChuan, maTieuChi);
+        });
+
+
+        document.getElementById('reset-filter-btn').addEventListener('click', function () {
+            document.getElementById('reset-filter-btn').style.display = 'none';
+            resetFilter();  // Gọi hàm bỏ lọc
+        });
+
+    </script>
+</body>
+
+</html>
