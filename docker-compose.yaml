@@ -14,7 +14,7 @@ services:
       - MYSQL_PASSWORD=
       - MYSQL_DB=bdu_qlctdtn
     depends_on:
-      - mysql  # Đảm bảo Flask chỉ khởi động sau MySQL
+      - mysql 
 
   mysql:
     image: mysql:8.0
