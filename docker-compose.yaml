@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .  # Đường dẫn tới thư mục chứa Dockerfile
+      dockerfile: Dockerfile
+    container_name: qlctdtn_web
+    ports:
+      - "3005:3005"  # Map cổng 3005 của container Flask ra máy chủ
+    environment:
+      - MYSQL_HOST=mysql  # Đảm bảo sử dụng tên dịch vụ MySQL
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=
+      - MYSQL_DB=bdu_qlctdtn
+    depends_on:
+      - mysql  # Đảm bảo Flask chỉ khởi động sau MySQL
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    ports:
+      - "3307:3306"  # Map cổng 3306 của container tới cổng 3307 trên máy chủ
+    environment:
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_DATABASE: bdu_qlctdtn
+    volumes:
+      - mysql_data:/var/lib/mysql  # Volume lưu trữ dữ liệu MySQL
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql  # Sao chép file init.sql vào thư mục init của MySQL
+
+volumes:
+  mysql_data:  # Dữ liệu MySQL sẽ được lưu trong volume này
