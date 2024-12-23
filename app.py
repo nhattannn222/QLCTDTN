@@ -9,7 +9,7 @@ from models.minh_chung import MinhChung
 from models.minh_chung_con import MinhChungCon
 from sqlalchemy.orm import joinedload
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 # Cấu hình kết nối MySQL
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{Config.MYSQL_USER}:{Config.MYSQL_PASSWORD}@{Config.MYSQL_HOST}/{Config.MYSQL_DB}"
