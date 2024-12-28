@@ -1,0 +1,150 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column; /* Đặt theo chiều dọc */
+    align-items: center; /* Căn giữa theo chiều ngang */
+    justify-content: flex-start; /* Đẩy nội dung lên trên */
+    height: 100vh;
+    margin: 0;
+}
+
+header {
+    display: flex;
+    justify-self: center;
+    justify-content: space-between;
+    color: #ad171c;
+    border-bottom: 2px solid #ad171c;
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%;
+    height: auto; 
+    background-color: #ffffff;
+    font-weight: bold;
+}
+
+.login-container {
+    background: #fff;
+    padding: 30px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin-top: 50px; /* Khoảng cách với header */
+}
+
+.login-container img {
+    display: block;
+    margin: 0 auto 20px;
+    width: 100px;
+    height: auto;
+}
+
+
+.login-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+
+.login-button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    background-color: #ad171c;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    box-sizing: border-box;
+    justify-self: center;
+}
+
+.login-button:hover {
+    background-color: #760508;
+    font-weight: bold;
+}
+
+.small-asterisk {
+    font-size: 0.5em; 
+    vertical-align: super; 
+    color: #a9050b;
+}
+
+
+
+/* Logo */
+header img.logo {
+    max-width: 300px;
+    height: auto;
+    margin-right: 20px; /* Khoảng cách giữa logo và nội dung */
+}
+
+/* Nội dung bên phải */
+header .content {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    width: 100%;
+}
+
+/* Tiêu đề */
+header .title {
+    font-size: 25px;
+    margin-bottom: 15px; /* Khoảng cách giữa tiêu đề và các nút */
+    text-align: center; /* Căn trái tiêu đề */
+}
+/* Thanh ngăn cách */
+.divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 20px;
+    padding: 0px 20px;
+    height: 2px;
+    width: 600px;
+    background-color: white;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background-color: #ad171c; /* Màu sắc của đường thẳng */
+    margin: 0 10px;
+}
+
+.divider i {
+    color: #ad171c;
+    margin: 0 10px;
+    font-size: 16px;
+}

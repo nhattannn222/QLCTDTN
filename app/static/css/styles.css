@@ -118,7 +118,7 @@ h3{
 /* General Table Styles */
 table {
     border-collapse: collapse;
-    width: 90%;  /* Giảm kích thước bảng */
+    width: 95%;  /* Giảm kích thước bảng */
     margin: 30px auto;
 
 }
@@ -320,3 +320,41 @@ th:nth-child(1), td:nth-child(1) {
     transition: background-color 0.3s, color 0.3s;
     text-align: center;
 }
+
+
+.btn-edit {
+    padding: 5px 10px;
+    border: #ad171c solid 2px;
+    color: #ad171c;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-edit:hover {
+    background-color: #ad171c;
+    color: #ffffff;
+}
+.link{
+    width: 150px; 
+    padding: 5px; 
+    border-radius: 4px;
+    border: #ad171c solid 1px;
+}
+
+.login-button {
+    width: 150px;
+    padding: 10px;
+    background-color: #ad171c;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    justify-self: center;
+}
+
+.login-button:hover {
+    background-color: #760508;
+    font-weight: bold;
+}
+

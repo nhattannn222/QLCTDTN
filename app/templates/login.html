@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang đăng nhập QLCTDTN</title>
+    <link rel="stylesheet" href="{{ base_url }}static/css/login.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Thêm jQuery -->
+</head>
+
+<body>
+    <header>
+        <img class="logo" src="{{ base_url }}static/img/logo.jpg" alt="Logo Trường Đại học Bình Dương">
+        <div class="content">
+            <div class="title">Quản lý chương trình đào tạo ngành</div>
+            <div class="divider">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="login-container">
+        <img src="{{ base_url }}static/img/icon-logo.png" alt="Logo" class="logo"
+            style="display: block; margin: 0 auto 20px; width: 100px; height: auto;">
+        <h1>Đăng nhập</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username"><i class="fa-solid fa-user"></i> Tài khoản <i
+                        class="fa-solid fa-asterisk small-asterisk"></i></label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fa-solid fa-key"></i> Mật khẩu <i
+                        class="fa-solid fa-asterisk small-asterisk"></i></label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <button type="submit" class="login-button">Xác nhận</button>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { login } from '{{ base_url }}static/js/auth.js';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.getElementById('login-form');
+
+            loginForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Gọi hàm login từ login.js
+                const baseUrl = '{{ base_url }}';
+                const result = await login(baseUrl, username, password);
+
+                if (result.success) {
+                    window.location.href = baseUrl; // Chuyển hướng nếu đăng nhập thành công
+                } else {
+                    alert('Đăng nhập thất bại: ' + result.message);
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

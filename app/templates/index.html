@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDU - QLCTDTN</title>
+    <link rel="stylesheet" href="{{ base_url }}static/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ base_url }}static/img/icon-logo.png">
+</head>
+
+<body data-base-url= {{base_url}}>
+    <!-- Header Section -->
+    <header>
+        <img class="logo" src="{{ base_url }}static/img/logo.jpg" alt="Logo Trường Đại học Bình Dương">
+        <div class="content">
+            <div class="title">Quản lý chương trình đào tạo ngành</div>
+            <div class="divider">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div class="buttons-container" id="nganh-buttons-container">
+                <!-- Các button sẽ được render vào đây -->
+            </div>
+        </div>
+        <div>
+            <button id="loginButton" class="login-button" onclick="handleLogin()"><i class="fa-solid fa-circle-user"></i> Đăng
+                nhập</button>
+            <button id="logoutButton" class="login-button" style="display: none;" onclick="handleLogout()"><i
+                    class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
+        </div>
+    </header>
+
+    <div class="header-container">
+        <div class="header-left">
+            <h3><i class="fa-solid fa-bars"></i> Danh mục minh chứng</h3>
+        </div>
+
+        <div class="header-right">
+            <!-- Dropdown Tiêu chuẩn -->
+            <label for="ma_tieu_chuan">Chức năng tìm kiếm:</label>
+            <select id="ma_tieu_chuan">
+                <option value="">-- Chọn tiêu chuẩn --</option>
+                <!-- Options sẽ được populate từ dữ liệu -->
+            </select>
+
+            <!-- Dropdown Tiêu chí (ẩn mặc định) -->
+            <label for="ma_tieu_chi" style="display: none;">Mã tiêu chí:</label>
+            <select id="ma_tieu_chi" style="display: none;">
+                <option value="">-- Chọn tiêu chí --</option>
+            </select>
+
+            <!-- Nút Lọc và Bỏ lọc -->
+            <button id="filter-btn" class="button_filter">Lọc</button>
+            <button id="reset-filter-btn" style="display: none;" class="button_filter">Bỏ lọc</button>
+        </div>
+    </div>
+
+    <div id="tables-container"></div> <!-- Mảng bảng sẽ được chèn vào đây -->
+
+    <div id="pagination"></div> <!-- Container cho các nút phân trang -->
+
+    <script type="module">
+        import { checkToken, handleLogin, handleLogout, toggleLoginLogoutButtons } from '..{{ base_url }}static/js/auth.js';
+        import { editLink, saveLink, isValidURL } from '..{{ base_url }}static/js/link_management.js';
+        import { renderPage, renderPagination, renderTables, renderNganh } from '..{{ base_url }}static/js/render.js';
+        import { filterMinhChung, resetFilter } from '..{{ base_url }}static/js/filter.js';
+        import { populateDropdown, populateDropdownTieuChi } from '..{{ base_url }}static/js/dropdown.js';
+
+        // Khai báo biến toàn cục trong thẻ <script>
+        let currentPage = 1;
+        let filteredData = [];
+        const itemsPerPage = 1; // Số mục trên mỗi trang, bạn có thể thay đổi giá trị này nếu cần
+
+        // Chờ DOM hoàn tất để xử lý sự kiện
+        document.addEventListener('DOMContentLoaded', function () {
+            // Truyền dữ liệu từ Flask sang JavaScript dưới dạng JSON hợp lệ
+            const data = {{ data | tojson | safe }};
+            populateDropdown(data); // Điền các mã tiêu chuẩn vào dropdown
+
+            renderPage(data, currentPage, itemsPerPage);
+            renderNganh();
+
+            // Thêm sự kiện thay đổi cho dropdown "ma_tieu_chuan"
+            document.getElementById('ma_tieu_chuan').addEventListener('change', function () {
+                const selectedTieuChuan = this.value;
+                populateDropdownTieuChi(data, selectedTieuChuan); // Truyền dữ liệu vào hàm
+            });
+
+            // Xử lý sự kiện lọc
+            document.getElementById('filter-btn').addEventListener('click', function () {
+                const ma_tieu_chuan = document.getElementById('ma_tieu_chuan').value;
+                const ma_tieu_chi = document.getElementById('ma_tieu_chi').value;
+                filterMinhChung(data, ma_tieu_chuan, ma_tieu_chi);  // Lọc dữ liệu khi nhấn nút lọc
+            });
+
+            // Xử lý sự kiện reset filter
+            document.getElementById('reset-filter-btn').addEventListener('click', function () {
+                resetFilter(data);  // Khôi phục dữ liệu gốc khi nhấn nút reset
+            });
+
+            // Đảm bảo hàm login được gọi khi nút đăng nhập được nhấn
+            document.getElementById('loginButton').addEventListener('click', handleLogin);
+            document.getElementById('logoutButton').addEventListener('click', handleLogout);
+
+            // Gắn sự kiện cho nút "Edit"
+            const editButtons = document.querySelectorAll('.btn-edit');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    editLink(button);  // Gọi hàm editLink
+                });
+            });
+
+            // Gắn sự kiện cho nút "Save"
+            const saveButtons = document.querySelectorAll('.btn-save');
+            saveButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    saveLink(button);  // Gọi hàm saveLink
+                });
+            });
+
+            // Gọi hàm toggleLoginLogoutButtons khi trang được tải
+            window.onload = toggleLoginLogoutButtons;
+        });
+        
+    </script>
+</body>
+</html>
