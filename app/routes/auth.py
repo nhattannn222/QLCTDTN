@@ -40,7 +40,8 @@ def login_route():
     except Exception as e:
         # Nếu có lỗi (ví dụ: tài khoản hoặc mật khẩu không đúng), trả về lỗi
         return jsonify({
-            'message': f"Thông tin đăng nhập không hợp lệ. Lỗi: {str(e)}"
+            'status': 401,
+            'message': f"Thông tin đăng nhập không hợp lệ"
         }), 401  # Trả về mã trạng thái HTTP 401 (Unauthorized)
 
 @auth_bp.route('/api/v1/register', methods=['POST'])

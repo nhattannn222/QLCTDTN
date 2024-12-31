@@ -17,11 +17,13 @@ header {
     width: 100%;
 }
 
+
 /* Logo */
 header img.logo {
     max-width: 300px;
     height: auto;
     margin-right: 20px; /* Khoảng cách giữa logo và nội dung */
+ 
 }
 
 /* Nội dung bên phải */
@@ -30,6 +32,7 @@ header .content {
     flex-direction: column; 
     align-items: center;
     width: 100%;
+  
 }
 
 /* Tiêu đề */
@@ -118,7 +121,7 @@ h3{
 /* General Table Styles */
 table {
     border-collapse: collapse;
-    width: 95%;  /* Giảm kích thước bảng */
+    width: 90%;  /* Giảm kích thước bảng */
     margin: 30px auto;
 
 }
@@ -259,6 +262,7 @@ th:nth-child(1), td:nth-child(1) {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px; /* Optional: Adjust space between header and content */
+    margin-top: 20px;
 }
 
 .header-left {
@@ -269,7 +273,11 @@ th:nth-child(1), td:nth-child(1) {
     display: flex;
     gap: 10px;
     align-items: center;
-    padding-right: 100px; /* Thêm padding bên phải để tránh sát lề */
+    margin-right: 80px; /* Thêm padding bên phải để tránh sát lề */
+    border-radius: 5px;
+    border: rgb(182, 182, 182) solid 1px;
+    padding: 10px;
+    background-color:#F5F5F5;
 }
 
 .header-right label {
@@ -307,6 +315,20 @@ th:nth-child(1), td:nth-child(1) {
     border-color: #007bff; /* Màu viền khi combobox được chọn */
 }
 
+/* Bộ lọc sau khi đăng nhập */
+#link_status {
+    display: flex;
+    align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+    gap: 5px; /* Khoảng cách giữa các radio button */
+
+}
+
+/* Thay đổi màu sắc của các radio button */
+#link_status input[type="radio"] {
+    accent-color: #ad171c; /* Thay đổi màu sắc của radio button thành đỏ */
+}
+
+
 
 .button_filter{
     background-color: #f4f4f4;
@@ -320,7 +342,6 @@ th:nth-child(1), td:nth-child(1) {
     transition: background-color 0.3s, color 0.3s;
     text-align: center;
 }
-
 
 .btn-edit {
     padding: 5px 10px;
@@ -350,11 +371,9 @@ th:nth-child(1), td:nth-child(1) {
     font-size: 14px;
     cursor: pointer;
     font-weight: bold;
-    justify-self: center;
 }
 
 .login-button:hover {
     background-color: #760508;
     font-weight: bold;
 }
-

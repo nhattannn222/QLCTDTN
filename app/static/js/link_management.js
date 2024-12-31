@@ -1,17 +1,28 @@
+let baseUrl = document.body.getAttribute('data-base-url');
+if (baseUrl !== '/qldt') {
+    baseUrl = "";
+}
+
+import { showMessage } from "./floating_message.js";
+
 // Hàm chỉnh sửa link
-
-const baseUrl = document.body.getAttribute('data-base-url');
-
 export function editLink(button) {
-    const tdSoMinhChung = button.closest('tr').querySelector('.so_minh_chung'); // Lấy phần tử <td> chứa so_minh_chung
-    const linkText = button.closest('td').previousElementSibling.querySelector('.link-text'); // Lấy phần tử hiển thị link
-    const input = button.closest('td').previousElementSibling.querySelector('.link'); // Lấy input chứa giá trị link
-    const saveButton = button.closest('td').querySelector('.btn-save'); // Lấy nút save
     const row = button.closest('tr'); // Lấy dòng <tr> chứa nút edit
+    const tdSoMinhChung = row.querySelector('.so_minh_chung'); // Lấy phần tử <td> chứa so_minh_chung
+    const linkText = row.querySelector('.link-text'); // Lấy phần tử hiển thị link
+    const input = row.querySelector('.link'); // Lấy input chứa giá trị link
+    const saveButton = row.querySelector('.btn-save'); // Lấy nút save
+    const maMinhChungCon = row.querySelector('.ma_minh_chung_con').textContent.trim();
+
+    // Kiểm tra nếu không có maMinhChungCon
+    if (!maMinhChungCon) {
+        showMessage("Không tìm thấy mã minh chứng con!", "error");
+        return;
+    }
 
     // Lấy giá trị so_minh_chung từ td
     const soMinhChung = tdSoMinhChung.textContent.trim(); // Lấy và trim giá trị so_minh_chung
-    
+
     // Hiển thị input và nút lưu, ẩn link và nút chỉnh sửa
     linkText.style.display = 'none';
     input.style.display = 'inline-block';
@@ -22,7 +33,8 @@ export function editLink(button) {
     input.value = linkText.querySelector('a') ? linkText.querySelector('a').href : ''; // Lấy giá trị của link nếu có
 
     // Gắn giá trị so_minh_chung vào input hoặc thực hiện xử lý gì đó
-    input.setAttribute('data-so-minh-chung', soMinhChung); // Gắn giá trị so_minh_chung vào input để gửi sau khi lưu
+    input.setAttribute('data-so-minh-chung', soMinhChung); // Gắn giá trị so_minh_chung vào input
+    input.setAttribute('data-ma-minh-chung-con', maMinhChungCon); // Gắn giá trị ma_minh_chung_con vào input
 }
 
 // Hàm lưu link
@@ -34,11 +46,12 @@ export function saveLink(button) {
 
     // Lấy giá trị so_minh_chung từ data-so-minh-chung (gắn vào input khi chỉnh sửa)
     const soMinhChung = input.getAttribute('data-so-minh-chung'); // Lấy giá trị so_minh_chung từ input
+    const maMinhChungCon = input.getAttribute('data-ma-minh-chung-con'); // Lấy ma_minh_chung_con từ input
 
     // Kiểm tra giá trị nhập vào có phải là URL hợp lệ
     const newLink = input.value.trim();
     if (!isValidURL(newLink)) {
-        alert('Vui lòng nhập một đường dẫn hợp lệ.');
+        showMessage("Vui lòng nhập một đường dẫn hợp lệ!", "error");
         return;
     }
 
@@ -60,12 +73,12 @@ export function saveLink(button) {
 
     // Kiểm tra nếu token không có
     if (!token) {
-        alert('Bạn chưa đăng nhập hoặc token không hợp lệ.');
+        showMessage('Bạn chưa đăng nhập hoặc token không hợp lệ.', 'error');
         return;
     }
 
     // Gửi yêu cầu PUT tới API để cập nhật link
-    const url = `${baseUrl}/api/v1/update_link/${soMinhChung}`;
+    const url = `${baseUrl}/api/v1/update_link/${maMinhChungCon}`;
     const data = { link: newLink };
 
     // Gửi yêu cầu PUT bằng fetch
@@ -80,14 +93,14 @@ export function saveLink(button) {
     .then(response => response.json())
     .then(data => {
         if (data.status == 200) {
-            alert('Cập nhật link thành công.');
+            showMessage(data.message);
         } else {
-            alert('Có lỗi xảy ra khi cập nhật link.');
+            showMessage("Thất bại!", "error");
         }
     })
     .catch(error => {
         console.error('Error updating link:', error);
-        alert('Có lỗi xảy ra khi cập nhật link.');
+        showMessage("Thất bại!", "error");
     });
 }
 

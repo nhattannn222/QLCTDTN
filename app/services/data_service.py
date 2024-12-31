@@ -2,6 +2,7 @@ from sqlalchemy.orm import joinedload
 from app.models import TieuChuan
 from app.models import TieuChi
 from app.models import MinhChung
+from app.models import NguoiDung
 
 def fetch_tieu_chuan_data(ma_nganh=None):
     # Truy vấn dữ liệu từ database với các mối quan hệ
@@ -10,7 +11,7 @@ def fetch_tieu_chuan_data(ma_nganh=None):
     )
 
     # Nếu có mã ngành, thêm điều kiện lọc theo mã ngành
-    if ma_nganh is not None:
+    if ma_nganh is not None and ma_nganh != 0:
         query = query.filter_by(ma_nganh=ma_nganh)
 
     # Lấy tất cả các tiêu chuẩn
@@ -44,3 +45,12 @@ def fetch_tieu_chuan_data(ma_nganh=None):
     return data
 
 
+def getMaNganh(token):
+    nguoi_dung = None  # Khởi tạo nguoi_dung mặc định là None
+
+    # Truy vấn người dùng có token tương ứng
+    if token is not None:
+        nguoi_dung = NguoiDung.query.filter_by(token=token).first()
+
+    if nguoi_dung: 
+        return nguoi_dung.ma_nganh

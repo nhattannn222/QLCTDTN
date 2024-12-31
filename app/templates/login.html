@@ -44,6 +44,7 @@
 
     <script type="module">
         import { login } from '{{ base_url }}static/js/auth.js';
+        import { showMessage } from '{{ base_url }}static/js/floating_message.js';
 
         document.addEventListener('DOMContentLoaded', function () {
             const loginForm = document.getElementById('login-form');
@@ -59,9 +60,10 @@
                 const result = await login(baseUrl, username, password);
 
                 if (result.success) {
+                    showMessage("Đăng nhập thành công!")
                     window.location.href = baseUrl; // Chuyển hướng nếu đăng nhập thành công
                 } else {
-                    alert('Đăng nhập thất bại: ' + result.message);
+                    showMessage(`Đăng nhập thất bại \n ${result.message}`,"error")
                 }
             });
         });

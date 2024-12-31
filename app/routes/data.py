@@ -7,7 +7,13 @@ data_bp = Blueprint('data', __name__)
 
 @data_bp.route('/api/v1/nganh')
 def nganh():
-    nganhs = getNganh()
+    token = request.cookies.get('token')  # Lấy token từ cookie
+
+    if token:
+        # Nếu có token, gọi hàm fetch_tieu_chuan_data
+        nganhs = getNganh(token)
+    else:
+        nganhs = getNganh()
     return jsonify({
             'status': 200,
             'data': nganhs

@@ -1,5 +1,7 @@
 // render.js
-const baseUrl = document.body.getAttribute('data-base-url');
+const baseUrl = document.body.getAttribute("data-base-url");
+import { editLink, saveLink } from './link_management.js';
+
 
 // Hàm renderPage
 export function renderPage(data, currentPage, itemsPerPage) {
@@ -36,6 +38,7 @@ export function renderPagination(data, currentPage, itemsPerPage) {
   prevButton.addEventListener("click", () => {
     currentPage--;
     renderPage(data, currentPage, itemsPerPage);
+    attachEditSaveEvents();
   });
   pagination.appendChild(prevButton);
 
@@ -48,6 +51,7 @@ export function renderPagination(data, currentPage, itemsPerPage) {
       currentPage = i;
 
       renderPage(data, currentPage, itemsPerPage);
+      attachEditSaveEvents();
     });
     pagination.appendChild(pageButton);
   }
@@ -59,6 +63,7 @@ export function renderPagination(data, currentPage, itemsPerPage) {
   nextButton.addEventListener("click", () => {
     currentPage++;
     renderPage(data, currentPage, itemsPerPage);
+    attachEditSaveEvents();
   });
   pagination.appendChild(nextButton);
 }
@@ -154,29 +159,33 @@ export function renderTables(data) {
                 }
                 checkToken()
                   ? (minhChungConRow.innerHTML += `
-    <tr data-minh-chung-con-id="${minhChungCon.id}">
-        <td class="so_minh_chung">${minhChungCon.so_minh_chung}</td>
-        <td style="font-size: 12px; text-align: start;">${minhChungCon.ten_minh_chung}</td>
-        <td style="width: 150px;">${minhChungCon.ngay_ban_hanh}</td>
-        <td style="font-size: 12px;">${minhChungCon.noi_ban_hanh}</td>
-        <td style="width: 170px; text-align: center;">
-            <span class="link-text">
-                ${minhChungCon.link ? `<a href="${minhChungCon.link}" target="_blank" class="btn">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                  </a>` : ''}
-            </span>
-            <input type="text" value="${minhChungCon.link || ''}" class="link" style="display: none;" />
-        </td>
-        <td>
-            <button class="btn-edit" style="margin-left: 5px;">
-                <i class="fa-solid fa-pen"></i> <!-- Biểu tượng bút -->
-            </button>
-            <button class="btn-save" style="margin-left: 5px; display: none;">
-                <i class="fa-solid fa-save"></i> <!-- Biểu tượng lưu -->
-            </button>
-        </td>
-    </tr>
-`): (minhChungConRow.innerHTML += `
+                  <tr>
+                      <span class="ma_minh_chung_con" style="display: none;">${minhChungCon.ma_minh_chung_con}</span>
+                      <td class="so_minh_chung">${minhChungCon.so_minh_chung}</td>
+                      <td style="font-size: 12px; text-align: start;">${minhChungCon.ten_minh_chung}</td>
+                      <td style="width: 150px;">${minhChungCon.ngay_ban_hanh}</td>
+                      <td style="font-size: 12px;">${minhChungCon.noi_ban_hanh}</td>
+                      <td style="width: 170px; text-align: center;">
+                          <span class="link-text">
+                              ${minhChungCon.link
+                                  ? `<a href="${minhChungCon.link}" target="_blank" class="btn">
+                                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>`
+                                  : ""}
+                          </span>
+                          <input type="text" value="${minhChungCon.link || ""}" class="link" style="display: none;" />
+                      </td>
+                      <td>
+                          <button class="btn-edit" style="margin-left: 5px;">
+                              <i class="fa-solid fa-pen"></i> <!-- Biểu tượng bút -->
+                          </button>
+                          <button class="btn-save" style="margin-left: 5px; display: none;">
+                              <i class="fa-solid fa-save"></i> <!-- Biểu tượng lưu -->
+                          </button>
+                      </td>
+                  </tr>
+              `)            
+                  : (minhChungConRow.innerHTML += `
                                     <td>${minhChungCon.so_minh_chung}</td>
                                     <td style="font-size: 12px; text-align: start;">${
                                       minhChungCon.ten_minh_chung
@@ -221,10 +230,34 @@ export function renderNganh() {
       if (data.status === 200 && data.data) {
         const container = document.getElementById("nganh-buttons-container");
 
-        // Duyệt qua danh sách ngành và tạo button cho từng ngành
+        // Lấy ma_nganh từ URL hiện tại
+        const currentMaNganh = window.location.pathname.split("/qldt/")[1];
+        
+
         data.data.forEach((nganh) => {
           const button = document.createElement("button");
           button.textContent = `Ngành ${nganh.ten_nganh}`;
+          if (nganh.ma_nganh == currentMaNganh) {
+            button.style.backgroundColor = "#ad171c"; // Màu nền
+            button.style.color = "white"; // Màu chữ
+          }
+          if ((currentMaNganh == 0||!currentMaNganh) && nganh.ma_nganh == 1) {
+            button.style.backgroundColor = "#ad171c"; // Màu nền
+            button.style.color = "white"; // Màu chữ
+          }
+          button.onclick = () => {
+            // Xóa màu nền của tất cả các button
+            document.querySelectorAll("button").forEach((btn) => {
+              btn.style.backgroundColor = ""; // Reset màu nền
+              btn.style.color = ""; // Reset màu chữ
+            });
+
+            button.style.backgroundColor = "#ad171c"; // Màu nền
+            button.style.color = "white"; // Màu chữ
+
+            // Điều hướng đến ma_nganh
+            window.location.href = `/qldt/${nganh.ma_nganh}`;
+          };
           container.appendChild(button);
         });
       } else {
@@ -237,10 +270,47 @@ export function renderNganh() {
 }
 
 export function checkToken() {
-  const token = document.cookie.split('; ').find(row => row.startsWith('token='));
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="));
   if (token) {
-      const tokenValue = token.split('=')[1];
-      return !!tokenValue; // Trả về true nếu token tồn tại
+    const tokenValue = token.split("=")[1];
+    return !!tokenValue; // Trả về true nếu token tồn tại
   }
   return false; // Trả về false nếu không có token
+}
+
+// Hàm render bộ lọc
+export function renderFilter(hasToken) {
+  const linkStatusContainer = document.getElementById("link_status");
+  const maTieuChuanDropdown = document.getElementById("ma_tieu_chuan");
+  const maTieuChiDropdown = document.getElementById("ma_tieu_chi");
+
+  if (hasToken) {
+    // Hiển thị bộ lọc "Đã gắn link" và "Chưa gắn link"
+    linkStatusContainer.style.display = "block";
+    maTieuChuanDropdown.style.display = "none";
+    maTieuChiDropdown.style.display = "none";
+  } else {
+    // Hiển thị bộ lọc theo tiêu chuẩn
+    linkStatusContainer.style.display = "none";
+    maTieuChuanDropdown.style.display = "block";
+    maTieuChiDropdown.style.display = "none"; // Ẩn tiêu chí mặc định
+  }
+}
+
+export function attachEditSaveEvents() {
+  const editButtons = document.querySelectorAll('.btn-edit');
+  editButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      editLink(button);  // Gọi hàm editLink
+    });
+  });
+
+  const saveButtons = document.querySelectorAll('.btn-save');
+  saveButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      saveLink(button);  // Gọi hàm saveLink
+    });
+  });
 }

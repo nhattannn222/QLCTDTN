@@ -43,10 +43,17 @@ export function handleLogin() {
 
 // Đăng xuất
 export function handleLogout() {
-    document.cookie = 'token=; max-age=0'; // Xóa cookie token
-    toggleLoginLogoutButtons(); // Cập nhật giao diện
-    location.reload(); // Làm mới trang sau 2 giây
+    // Xóa cookie "token"
+    document.cookie = 'token=; max-age=0; path=/'; // max-age=0 sẽ làm cookie hết hạn ngay lập tức
+    console.log("Cookie token đã bị xóa");
+
+    // Cập nhật giao diện (ẩn nút Đăng nhập, hiển thị nút Đăng xuất)
+    toggleLoginLogoutButtons();
+    setTimeout(function() {
+        location.reload(); // Làm mới trang sau 1 giây
+    }, 1000);
 }
+
 
 // Điều chỉnh hiển thị nút đăng nhập/đăng xuất
 export function toggleLoginLogoutButtons() {
@@ -54,12 +61,13 @@ export function toggleLoginLogoutButtons() {
 
     const loginButton = document.getElementById('loginButton');
     const logoutButton = document.getElementById('logoutButton');
-
+    
     if (isLoggedIn) {
         loginButton.style.display = 'none'; // Ẩn nút đăng nhập
         logoutButton.style.display = 'block'; // Hiển thị nút đăng xuất
     } else {
         loginButton.style.display = 'block'; // Hiển thị nút đăng nhập
         logoutButton.style.display = 'none'; // Ẩn nút đăng xuất
+        
     }
 }

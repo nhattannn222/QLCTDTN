@@ -10,7 +10,7 @@
     <link rel="icon" type="image/x-icon" href="{{ base_url }}static/img/icon-logo.png">
 </head>
 
-<body data-base-url= {{base_url}}>
+<body data-base-url="{{ base_url }}">
     <!-- Header Section -->
     <header>
         <img class="logo" src="{{ base_url }}static/img/logo.jpg" alt="Logo Trường Đại học Bình Dương">
@@ -24,10 +24,8 @@
             </div>
         </div>
         <div>
-            <button id="loginButton" class="login-button" onclick="handleLogin()"><i class="fa-solid fa-circle-user"></i> Đăng
-                nhập</button>
-            <button id="logoutButton" class="login-button" style="display: none;" onclick="handleLogout()"><i
-                    class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
+            <button id="loginButton" class="login-button"><i class="fa-solid fa-circle-user"></i> Đăng nhập</button>
+            <button id="logoutButton" class="login-button" style="display: none;"><i class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
         </div>
     </header>
 
@@ -38,7 +36,7 @@
 
         <div class="header-right">
             <!-- Dropdown Tiêu chuẩn -->
-            <label for="ma_tieu_chuan">Chức năng tìm kiếm:</label>
+            <label for="link_status"><i class="fa-solid fa-filter"></i> Bộ lọc:</label>
             <select id="ma_tieu_chuan">
                 <option value="">-- Chọn tiêu chuẩn --</option>
                 <!-- Options sẽ được populate từ dữ liệu -->
@@ -49,6 +47,15 @@
             <select id="ma_tieu_chi" style="display: none;">
                 <option value="">-- Chọn tiêu chí --</option>
             </select>
+            <!-- Radio button cho "Đã gắn link" và "Chưa gắn link" -->
+
+            <div id="link_status">
+                <input type="radio" id="da_gan_link" name="link_status" value="da_gan_link">
+                <label for="da_gan_link">Đã gắn Link</label><br>
+
+                <input type="radio" id="chua_gan_link" name="link_status" value="chua_gan_link">
+                <label for="chua_gan_link">Chưa gắn Link</label>
+            </div>
 
             <!-- Nút Lọc và Bỏ lọc -->
             <button id="filter-btn" class="button_filter">Lọc</button>
@@ -61,25 +68,28 @@
     <div id="pagination"></div> <!-- Container cho các nút phân trang -->
 
     <script type="module">
-        import { checkToken, handleLogin, handleLogout, toggleLoginLogoutButtons } from '..{{ base_url }}static/js/auth.js';
-        import { editLink, saveLink, isValidURL } from '..{{ base_url }}static/js/link_management.js';
-        import { renderPage, renderPagination, renderTables, renderNganh } from '..{{ base_url }}static/js/render.js';
-        import { filterMinhChung, resetFilter } from '..{{ base_url }}static/js/filter.js';
-        import { populateDropdown, populateDropdownTieuChi } from '..{{ base_url }}static/js/dropdown.js';
+        import { checkToken, handleLogin, handleLogout, toggleLoginLogoutButtons } from '{{ base_url }}static/js/auth.js';
+        import { editLink, saveLink, isValidURL } from '{{ base_url }}static/js/link_management.js';
+        import { renderPage, renderPagination, renderTables, renderNganh, renderFilter, attachEditSaveEvents } from '{{ base_url }}static/js/render.js';
+        import { filterMinhChung, filterByLink, resetFilter } from '{{ base_url }}static/js/filter.js';
+        import { populateDropdown, populateDropdownTieuChi } from '{{ base_url }}static/js/dropdown.js';
 
         // Khai báo biến toàn cục trong thẻ <script>
         let currentPage = 1;
         let filteredData = [];
-        const itemsPerPage = 1; // Số mục trên mỗi trang, bạn có thể thay đổi giá trị này nếu cần
+        let filterStatus = null;
 
-        // Chờ DOM hoàn tất để xử lý sự kiện
+        const itemsPerPage = 1; // Số mục trên mỗi trang, bạn có thể thay đổi giá trị này nếu cần
+        const hasToken = checkToken(); // Kiểm tra token từ cookie
+
         document.addEventListener('DOMContentLoaded', function () {
             // Truyền dữ liệu từ Flask sang JavaScript dưới dạng JSON hợp lệ
             const data = {{ data | tojson | safe }};
             populateDropdown(data); // Điền các mã tiêu chuẩn vào dropdown
-
-            renderPage(data, currentPage, itemsPerPage);
             renderNganh();
+            renderPage(data, currentPage, itemsPerPage);
+
+            renderFilter(hasToken);
 
             // Thêm sự kiện thay đổi cho dropdown "ma_tieu_chuan"
             document.getElementById('ma_tieu_chuan').addEventListener('change', function () {
@@ -87,16 +97,38 @@
                 populateDropdownTieuChi(data, selectedTieuChuan); // Truyền dữ liệu vào hàm
             });
 
+            // Set filterStatus based on selected radio button
+            document.getElementById('da_gan_link').addEventListener("change", function () {
+                if (this.checked) {
+                    filterStatus = "da_gan_link";
+                }
+            });
+
+            document.getElementById('chua_gan_link').addEventListener("change", function () {
+                if (this.checked) {
+                    filterStatus = "chua_gan_link";
+                }
+            });
+
             // Xử lý sự kiện lọc
             document.getElementById('filter-btn').addEventListener('click', function () {
                 const ma_tieu_chuan = document.getElementById('ma_tieu_chuan').value;
                 const ma_tieu_chi = document.getElementById('ma_tieu_chi').value;
-                filterMinhChung(data, ma_tieu_chuan, ma_tieu_chi);  // Lọc dữ liệu khi nhấn nút lọc
+                const selectedStatus = document.querySelector('input[name="link_status"]:checked')?.value;
+
+                if (ma_tieu_chuan) {
+                    filterMinhChung(data, ma_tieu_chuan, ma_tieu_chi);  // Lọc dữ liệu khi nhấn nút lọc
+                    attachEditSaveEvents(); // Gắn lại sự kiện
+                } else if (selectedStatus) {
+                    filterByLink(data, selectedStatus); // Filter by link status
+                    attachEditSaveEvents(); // Gắn lại sự kiện
+                }
             });
 
             // Xử lý sự kiện reset filter
             document.getElementById('reset-filter-btn').addEventListener('click', function () {
                 resetFilter(data);  // Khôi phục dữ liệu gốc khi nhấn nút reset
+                attachEditSaveEvents(); // Gắn lại sự kiện
             });
 
             // Đảm bảo hàm login được gọi khi nút đăng nhập được nhấn
@@ -120,9 +152,11 @@
             });
 
             // Gọi hàm toggleLoginLogoutButtons khi trang được tải
-            window.onload = toggleLoginLogoutButtons;
+            window.onload = () => {
+                toggleLoginLogoutButtons();
+            };
         });
-        
     </script>
 </body>
+
 </html>
