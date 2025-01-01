@@ -14,7 +14,7 @@ services:
       - MYSQL_PASSWORD=
       - MYSQL_DB=bdu_qlctdtn
       - SECRET_KEY=
-      - BASE_URL=/qldt
+      - BASE_URL=/qldt/
     depends_on:
       - mysql 
 

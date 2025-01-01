@@ -78,7 +78,7 @@ export function saveLink(button) {
     }
 
     // Gửi yêu cầu PUT tới API để cập nhật link
-    const url = `${baseUrl}/api/v1/update_link/${maMinhChungCon}`;
+    const url = `/qldt/api/v1/update_link/${maMinhChungCon}`;
     const data = { link: newLink };
 
     // Gửi yêu cầu PUT bằng fetch
