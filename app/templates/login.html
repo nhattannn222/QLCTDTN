@@ -60,10 +60,12 @@
                 const result = await login(baseUrl, username, password);
 
                 if (result.success) {
-                    showMessage("Đăng nhập thành công!")
-                    window.location.href = baseUrl; // Chuyển hướng nếu đăng nhập thành công
+                    showMessage("Đăng nhập thành công!");
+                    setTimeout(() => {
+                        window.location.href = baseUrl; // Chuyển hướng nếu đăng nhập thành công
+                    }, 500); // Delay 0.5 giây
                 } else {
-                    showMessage(`Đăng nhập thất bại \n ${result.message}`,"error")
+                    showMessage(`Đăng nhập thất bại \n ${result.message}`, "error");
                 }
             });
         });

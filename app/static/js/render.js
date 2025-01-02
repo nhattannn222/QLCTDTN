@@ -1,6 +1,6 @@
 // render.js
 const baseUrl = document.body.getAttribute("data-base-url");
-import { editLink, saveLink } from './link_management.js';
+import { editLink } from './link_management.js';
 
 
 // Hàm renderPage
@@ -160,6 +160,7 @@ export function renderTables(data) {
                 checkToken()
                   ? (minhChungConRow.innerHTML += `
                   <tr>
+                      <span class="ma_minh_chung_data" style="display: none;">${minhChung.ma_minh_chung}</span>
                       <span class="ma_minh_chung_con" style="display: none;">${minhChungCon.ma_minh_chung_con}</span>
                       <td class="so_minh_chung">${minhChungCon.so_minh_chung}</td>
                       <td style="font-size: 12px; text-align: start;">${minhChungCon.ten_minh_chung}</td>
@@ -307,10 +308,5 @@ export function attachEditSaveEvents() {
     });
   });
 
-  const saveButtons = document.querySelectorAll('.btn-save');
-  saveButtons.forEach(button => {
-    button.addEventListener('click', function () {
-      saveLink(button);  // Gọi hàm saveLink
-    });
-  });
+  
 }

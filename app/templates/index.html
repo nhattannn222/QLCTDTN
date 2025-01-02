@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BDU - QLCTDTN</title>
     <link rel="stylesheet" href="{{ base_url }}static/css/styles.css">
+    <link rel="stylesheet" href="{{ base_url }}static/css/popup.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="{{ base_url }}static/img/icon-logo.png">
 </head>
@@ -25,7 +26,8 @@
         </div>
         <div>
             <button id="loginButton" class="login-button"><i class="fa-solid fa-circle-user"></i> Đăng nhập</button>
-            <button id="logoutButton" class="login-button" style="display: none;"><i class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
+            <button id="logoutButton" class="login-button" style="display: none;"><i
+                    class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
         </div>
     </header>
 
@@ -66,10 +68,40 @@
     <div id="tables-container"></div> <!-- Mảng bảng sẽ được chèn vào đây -->
 
     <div id="pagination"></div> <!-- Container cho các nút phân trang -->
+    <!-- Popup Container -->
+    <div id="popup-container" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h3>Chỉnh sửa link</h3>
+
+            <!-- Thông báo không có liên kết -->
+            <div id="no-links-message" style="display: none; color: red; font-size: 16px; margin-bottom: 10px;">
+                Không có liên kết nào để chọn.
+            </div>
+
+            <!-- Danh sách liên kết -->
+            <div id="popup-link-list" class="popup-link-list"></div>
+
+            <!-- Khu vực tải file -->
+            <div class="file-upload-section" style="margin-top: 15px;">
+                <label for="file-upload" style="display: block; margin-bottom: 5px;">Tải tệp lên:</label>
+                <input type="file" id="file-upload" style="margin-bottom: 10px;" />
+                <button id="upload-button" class="popup-upload">Tải lên</button>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="popup-buttons">
+                <button id="popup-save" class="popup-save">Lưu</button>
+                <button id="popup-cancel" class="popup-cancel">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <script type="module">
         import { checkToken, handleLogin, handleLogout, toggleLoginLogoutButtons } from '{{ base_url }}static/js/auth.js';
-        import { editLink, saveLink, isValidURL } from '{{ base_url }}static/js/link_management.js';
+        import { editLink } from '{{ base_url }}static/js/link_management.js';
         import { renderPage, renderPagination, renderTables, renderNganh, renderFilter, attachEditSaveEvents } from '{{ base_url }}static/js/render.js';
         import { filterMinhChung, filterByLink, resetFilter } from '{{ base_url }}static/js/filter.js';
         import { populateDropdown, populateDropdownTieuChi } from '{{ base_url }}static/js/dropdown.js';
@@ -84,77 +116,71 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             // Truyền dữ liệu từ Flask sang JavaScript dưới dạng JSON hợp lệ
-            const data = {{ data | tojson | safe }};
-            populateDropdown(data); // Điền các mã tiêu chuẩn vào dropdown
-            renderNganh();
-            renderPage(data, currentPage, itemsPerPage);
+            const data = {{ data | tojson | safe
+        }};
+        populateDropdown(data); // Điền các mã tiêu chuẩn vào dropdown
+        renderNganh();
+        renderPage(data, currentPage, itemsPerPage);
 
-            renderFilter(hasToken);
+        renderFilter(hasToken);
 
-            // Thêm sự kiện thay đổi cho dropdown "ma_tieu_chuan"
-            document.getElementById('ma_tieu_chuan').addEventListener('change', function () {
-                const selectedTieuChuan = this.value;
-                populateDropdownTieuChi(data, selectedTieuChuan); // Truyền dữ liệu vào hàm
-            });
+        // Thêm sự kiện thay đổi cho dropdown "ma_tieu_chuan"
+        document.getElementById('ma_tieu_chuan').addEventListener('change', function () {
+            const selectedTieuChuan = this.value;
+            populateDropdownTieuChi(data, selectedTieuChuan); // Truyền dữ liệu vào hàm
+        });
 
-            // Set filterStatus based on selected radio button
-            document.getElementById('da_gan_link').addEventListener("change", function () {
-                if (this.checked) {
-                    filterStatus = "da_gan_link";
-                }
-            });
+        // Set filterStatus based on selected radio button
+        document.getElementById('da_gan_link').addEventListener("change", function () {
+            if (this.checked) {
+                filterStatus = "da_gan_link";
+            }
+        });
 
-            document.getElementById('chua_gan_link').addEventListener("change", function () {
-                if (this.checked) {
-                    filterStatus = "chua_gan_link";
-                }
-            });
+        document.getElementById('chua_gan_link').addEventListener("change", function () {
+            if (this.checked) {
+                filterStatus = "chua_gan_link";
+            }
+        });
 
-            // Xử lý sự kiện lọc
-            document.getElementById('filter-btn').addEventListener('click', function () {
-                const ma_tieu_chuan = document.getElementById('ma_tieu_chuan').value;
-                const ma_tieu_chi = document.getElementById('ma_tieu_chi').value;
-                const selectedStatus = document.querySelector('input[name="link_status"]:checked')?.value;
+        // Xử lý sự kiện lọc
+        document.getElementById('filter-btn').addEventListener('click', function () {
+            const ma_tieu_chuan = document.getElementById('ma_tieu_chuan').value;
+            const ma_tieu_chi = document.getElementById('ma_tieu_chi').value;
+            const selectedStatus = document.querySelector('input[name="link_status"]:checked')?.value;
 
-                if (ma_tieu_chuan) {
-                    filterMinhChung(data, ma_tieu_chuan, ma_tieu_chi);  // Lọc dữ liệu khi nhấn nút lọc
-                    attachEditSaveEvents(); // Gắn lại sự kiện
-                } else if (selectedStatus) {
-                    filterByLink(data, selectedStatus); // Filter by link status
-                    attachEditSaveEvents(); // Gắn lại sự kiện
-                }
-            });
-
-            // Xử lý sự kiện reset filter
-            document.getElementById('reset-filter-btn').addEventListener('click', function () {
-                resetFilter(data);  // Khôi phục dữ liệu gốc khi nhấn nút reset
+            if (ma_tieu_chuan) {
+                filterMinhChung(data, ma_tieu_chuan, ma_tieu_chi);  // Lọc dữ liệu khi nhấn nút lọc
                 attachEditSaveEvents(); // Gắn lại sự kiện
+            } else if (selectedStatus) {
+                filterByLink(data, selectedStatus); // Filter by link status
+                attachEditSaveEvents(); // Gắn lại sự kiện
+            }
+        });
+
+        // Xử lý sự kiện reset filter
+        document.getElementById('reset-filter-btn').addEventListener('click', function () {
+            resetFilter(data);  // Khôi phục dữ liệu gốc khi nhấn nút reset
+            attachEditSaveEvents(); // Gắn lại sự kiện
+        });
+
+        // Đảm bảo hàm login được gọi khi nút đăng nhập được nhấn
+        document.getElementById('loginButton').addEventListener('click', handleLogin);
+        document.getElementById('logoutButton').addEventListener('click', handleLogout);
+
+        // Gắn sự kiện cho nút "Edit"
+        const editButtons = document.querySelectorAll('.btn-edit');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                editLink(button);
             });
+        });
 
-            // Đảm bảo hàm login được gọi khi nút đăng nhập được nhấn
-            document.getElementById('loginButton').addEventListener('click', handleLogin);
-            document.getElementById('logoutButton').addEventListener('click', handleLogout);
 
-            // Gắn sự kiện cho nút "Edit"
-            const editButtons = document.querySelectorAll('.btn-edit');
-            editButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    editLink(button);  // Gọi hàm editLink
-                });
-            });
-
-            // Gắn sự kiện cho nút "Save"
-            const saveButtons = document.querySelectorAll('.btn-save');
-            saveButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    saveLink(button);  // Gọi hàm saveLink
-                });
-            });
-
-            // Gọi hàm toggleLoginLogoutButtons khi trang được tải
-            window.onload = () => {
-                toggleLoginLogoutButtons();
-            };
+        // Gọi hàm toggleLoginLogoutButtons khi trang được tải
+        window.onload = () => {
+            toggleLoginLogoutButtons();
+        };
         });
     </script>
 </body>

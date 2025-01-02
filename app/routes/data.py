@@ -1,7 +1,10 @@
+import io
 from flask import Blueprint, jsonify, request
 from app.services.nganh import getNganh
 from app.services.minh_chung_con import update_link
 from app.middlewares.authorize import authorize
+from googleapiclient.http import MediaIoBaseUpload
+from app.services.link_drive import list_files_in_folder, authenticate_google_drive, get_folder_id_by_name, upload_file_to_drive
 
 data_bp = Blueprint('data', __name__)
 
@@ -47,3 +50,71 @@ def update_link_route(minh_chung_con_id):
     except Exception as e:
         # Trả về lỗi nếu có bất kỳ sự cố nào
         return jsonify({'status': 500, 'message': f'Lỗi server: {str(e)}'}), 500
+
+
+@data_bp.route('/api/v1/get_links', methods=['GET'])
+def get_files():
+    # Lấy tên thư mục từ tham số URL
+    folder_name = request.args.get('folder_name')
+    if not folder_name:
+        return jsonify({"error": "folder_name is required"}), 400
+
+    # Xác thực và kết nối với Google Drive API
+    service = authenticate_google_drive()
+    if not service:
+        return jsonify({"error": "Không thể xác thực với Google Drive API"}), 500
+
+    # Tìm ID của thư mục dựa trên tên
+    folder_id = get_folder_id_by_name(service, folder_name)
+    if not folder_id:
+        return jsonify({"error": "Không tìm thấy thư mục"}), 404
+
+    # Lấy danh sách các tệp trong thư mục
+    files = list_files_in_folder(service, folder_id)
+
+    # Tạo URL của thư mục
+    folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
+
+    # Trả về danh sách tệp và URL thư mục dưới dạng JSON
+    file_list = [{"name": file['name'], "url": f"https://drive.google.com/file/d/{file['id']}"} for file in files]
+    
+    return jsonify({"folder_url": folder_url, "files": file_list})
+
+@data_bp.route('/api/v1/upload_file', methods=['POST'])
+def upload_file():
+    folder_name = request.args.get('folder_name')
+    if not folder_name:
+        return jsonify({"error": "folder_name is required"}), 400
+
+    if 'file' not in request.files:
+        return jsonify({"error": "File is required"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    # Xác thực và kết nối với Google Drive API
+    service = authenticate_google_drive()
+    if not service:
+        return jsonify({"error": "Cannot authenticate with Google Drive API"}), 500
+    
+    # Tìm ID của thư mục dựa trên tên
+    folder_id = get_folder_id_by_name(service, folder_name)
+    if not folder_id:
+        return jsonify({"error": "Không tìm thấy thư mục"}), 404
+
+    try:
+        # Tạo một đối tượng BytesIO từ tệp
+        file_stream = io.BytesIO(file.read())
+        
+        # Gọi hàm upload_file_to_drive để tải file lên
+        uploaded_file = upload_file_to_drive(service, file_stream, file.filename, folder_id)
+    
+        if uploaded_file:
+            return jsonify({"file_id": uploaded_file.get('id')})
+        else:
+            return jsonify({"error": "Error uploading file"}), 500
+
+    except Exception as e:
+        print(f"Lỗi khi xử lý tệp: {e}")
+        return jsonify({"error": "Error processing file"}), 500
