@@ -123,7 +123,7 @@ CREATE TABLE `nguoi_dung` (
 
 LOCK TABLES `nguoi_dung` WRITE;
 /*!40000 ALTER TABLE `nguoi_dung` DISABLE KEYS */;
-INSERT INTO `nguoi_dung` VALUES ('admin','$2b$12$W67mFfPqaCcvBCnLRB79Hus30V4hDr6Ck0cWc21uWwOFEzsAayfau','admin',0,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWlfa2hvYW4iOiJhZG1pbiIsInZhaV90cm8iOiJhZG1pbiIsIm1hX25nYW5oIjoiIiwiZXhwIjoxNzM1NzQzMjYwfQ.1ZXGnX-tQ-Wapd37xReTjCAMAMLoAPc0mNN9Jk0CeYk'),('manager1','$2b$12$W1/BJ.OBvD.p3Pi5MzMaeukb7InxY8yd9Xb11JVWOa4ZFNlWROkcO','manager',1,NULL),('manager2','$2b$12$.umNAr8evcCeKcNLn15RJeys/Sv9ev8nPf6Pau7Tz931OpvfLGsEi','manager',2,NULL),('manager3','$2b$12$r/cMFGzAqc67REdCrtkYPucycPPjkOhpJ2Gv1zsWeGdwPUFR32qoK','manager',3,NULL),('manager4','$2b$12$VxWn5zpBHJhX7KDvO6ysUODOHH/XApqyLfdwY3y4/x9Qm76PP/Qa2','manager',4,NULL),('manager5','$2b$12$MlyjMN6vGv0mCf7aZi/FEO/oHJgWKC6Nk0FcVMV7xvmx04tq28TMS','manager',5,NULL);
+INSERT INTO `nguoi_dung` VALUES ('admin','$2b$12$SpBmGP55IiL7ZIY1q/ua6.xzgHRS8lJXEv0PpHmk8fPBmwuabFc.G','admin',0,NULL),('manager1','$2b$12$LVlTfTTI/hIr7FN75HfM9eEbuDpj.E3ZpYKegpAKN6xfPRV/Rxqbi','manager',1,NULL),('manager2','$2b$12$HquLIpUg6ikYTIBPBYucoe1vgMOYbGVOwfZQ1AGrKr3F4ueNM4knG','manager',2,NULL),('manager3','$2b$12$gk63yJmN2Ttbg/O3JVUT5.FU/NcSfIrZjxEeIZI14X2GwWP38Frmy','manager',3,NULL),('manager4','$2b$12$ZBXrshQBr28MfrwZPrfVPuuMLrcpez9m46tUhNiHDXZBtt9jdqSJ.','manager',4,NULL),('manager5','$2b$12$kBAxhNnMdO.NowwzYTJqSum5/cYntnBpjSM13vtFQngCa5swy5NBy','manager',5,NULL);
 /*!40000 ALTER TABLE `nguoi_dung` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -190,4 +190,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-01-01 21:21:54
+-- Dump completed on 2025-01-02 13:55:31
