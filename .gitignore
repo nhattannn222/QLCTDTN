@@ -4,5 +4,4 @@
 # Bỏ qua thư mục __pycache__ và các file .pyc
 __pycache__/
 *.pyc
-
 /app/secrets
