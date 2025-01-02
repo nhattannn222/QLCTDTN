@@ -5,7 +5,3 @@
 __pycache__/
 *.pyc
 
-
-/app/secrets/credentials.json
-/app/secrets/token.json
-/app/database/init.sql
