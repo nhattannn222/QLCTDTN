@@ -4,4 +4,8 @@
 # Bỏ qua thư mục __pycache__ và các file .pyc
 __pycache__/
 *.pyc
-/app/secrets
+
+
+/app/secrets/credentials.json
+/app/secrets/token.json
+/app/database/init.sql

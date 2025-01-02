@@ -1,5 +1,5 @@
 let baseUrl = document.body.getAttribute("data-base-url");
-if (baseUrl !== "/qldt") {
+if (baseUrl !== "/qldt/") {
   baseUrl = "";
 }
 
@@ -74,50 +74,53 @@ function showPopup(saveCallback, maMinhChung, currentLink = "") {
       showMessage("Không thể tải danh sách liên kết từ Google Drive.", "error");
     });
 
-  const handleUpload = () => {
-    const files = fileInput.files; // Lấy danh sách các file được chọn
-    if (files.length > 0) {
-      const apiUrl = `${baseUrl}api/v1/upload_file?folder_name=${maMinhChung}`;
-      const uploadPromises = []; // Danh sách các promise để tải từng file
-
-      // Duyệt qua từng file và tạo promise để tải lên
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const uploadPromise = fetch(apiUrl, {
-          method: "POST",
-          body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.file_id) {
-              showMessage(`Tải file "${file.name}" lên thành công!`, "success");
-            } else {
-              showMessage(`Tải file "${file.name}" lên thất bại!`, "error");
-            }
+    const handleUpload = () => {
+      const files = fileInput.files; // Lấy danh sách các file được chọn
+      if (files.length > 0) {
+        const apiUrl = `${baseUrl}api/v1/upload_file?folder_name=${maMinhChung}`;
+        const uploadPromises = []; // Danh sách các promise để tải từng file
+    
+        // Duyệt qua từng file và tạo promise để tải lên
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const formData = new FormData();
+          formData.append("file", file);
+    
+          const uploadPromise = fetch(apiUrl, {
+            method: "POST",
+            body: formData,
           })
-          .catch((error) => {
-            console.error(`Error uploading file "${file.name}":`, error);
-            showMessage(
-              `Có lỗi xảy ra khi tải file "${file.name}" lên.`,
-              "error"
-            );
-          });
-
-        uploadPromises.push(uploadPromise);
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.file_id) {
+                showMessage(`Tải file "${file.name}" lên thành công!`, "success");
+              } else {
+                showMessage(`Tải file "${file.name}" lên thất bại!`, "error");
+              }
+            })
+            .catch((error) => {
+              console.error(`Error uploading file "${file.name}":`, error);
+              showMessage(
+                `Có lỗi xảy ra khi tải file "${file.name}" lên.`,
+                "error"
+              );
+            });
+    
+          uploadPromises.push(uploadPromise);
+        }
+    
+        // Chờ tất cả các file được tải lên
+        Promise.all(uploadPromises).then(() => {
+          // Làm mới danh sách liên kết sau khi tải lên xong
+          showPopup(saveCallback, maMinhChung);
+          // Xóa nội dung của fileInput
+          fileInput.value = "";
+        });
+      } else {
+        showMessage("Vui lòng chọn ít nhất một file để tải lên!", "error");
       }
-
-      // Chờ tất cả các file được tải lên
-      Promise.all(uploadPromises).then(() => {
-        // Làm mới danh sách liên kết sau khi tải lên xong
-        showPopup(saveCallback, maMinhChung);
-      });
-    } else {
-      showMessage("Vui lòng chọn ít nhất một file để tải lên!", "error");
-    }
-  };
+    };
+    
 
   uploadButton.addEventListener("click", handleUpload);
 

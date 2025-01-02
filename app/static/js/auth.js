@@ -38,7 +38,7 @@ export async function login(baseUrl, username, password) {
 
 // Chuyển hướng đến trang đăng nhập
 export function handleLogin() {
-    window.location.href = `${baseUrl}/login`;
+    window.location.href = `${baseUrl}login`;
 }
 
 // Đăng xuất
@@ -51,6 +51,7 @@ export function handleLogout() {
     toggleLoginLogoutButtons();
     setTimeout(function() {
         location.reload(); // Làm mới trang sau 1 giây
+        window.location.href = `${baseUrl}`;
     }, 1000);
 }
 
