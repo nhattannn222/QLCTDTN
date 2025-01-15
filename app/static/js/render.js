@@ -1,7 +1,6 @@
 // render.js
 const baseUrl = document.body.getAttribute("data-base-url");
-import { editLink } from './link_management.js';
-
+import { editLink } from "./link_management.js";
 
 // Hàm renderPage
 export function renderPage(data, currentPage, itemsPerPage) {
@@ -160,21 +159,40 @@ export function renderTables(data) {
                 checkToken()
                   ? (minhChungConRow.innerHTML += `
                   <tr>
-                      <span class="ma_minh_chung_data" style="display: none;">${minhChung.ma_minh_chung}</span>
-                      <span class="ma_minh_chung_con" style="display: none;">${minhChungCon.ma_minh_chung_con}</span>
-                      <td class="so_minh_chung">${minhChungCon.so_minh_chung}</td>
-                      <td style="font-size: 12px; text-align: start;">${minhChungCon.ten_minh_chung}</td>
-                      <td style="width: 150px;">${minhChungCon.ngay_ban_hanh}</td>
-                      <td style="font-size: 12px;">${minhChungCon.noi_ban_hanh}</td>
+                      <span class="ma_minh_chung_data" style="display: none;">${
+                        minhChung.ma_minh_chung
+                      }</span>
+                      <span class="folderUrl" style="display: none;">${
+                        minhChung.url
+                      }</span>
+                      <span class="ma_minh_chung_con" style="display: none;">${
+                        minhChungCon.ma_minh_chung_con
+                      }</span>
+                      <td class="so_minh_chung">${
+                        minhChungCon.so_minh_chung
+                      }</td>
+                      <td style="font-size: 12px; text-align: start;">${
+                        minhChungCon.ten_minh_chung
+                      }</td>
+                      <td style="width: 150px;">${
+                        minhChungCon.ngay_ban_hanh
+                      }</td>
+                      <td style="font-size: 12px;">${
+                        minhChungCon.noi_ban_hanh
+                      }</td>
                       <td style="width: 170px; text-align: center;">
                           <span class="link-text">
-                              ${minhChungCon.link
+                              ${
+                                minhChungCon.link
                                   ? `<a href="${minhChungCon.link}" target="_blank" class="btn">
                                       <i class="fa-solid fa-arrow-up-right-from-square"></i>
                                     </a>`
-                                  : ""}
+                                  : ""
+                              }
                           </span>
-                          <input type="text" value="${minhChungCon.link || ""}" class="link" style="display: none;" />
+                          <input type="text" value="${
+                            minhChungCon.link || ""
+                          }" class="link" style="display: none;" />
                       </td>
                       <td>
                           <button class="btn-edit" style="margin-left: 5px;">
@@ -185,7 +203,7 @@ export function renderTables(data) {
                           </button>
                       </td>
                   </tr>
-              `)            
+              `)
                   : (minhChungConRow.innerHTML += `
                                     <td>${minhChungCon.so_minh_chung}</td>
                                     <td style="font-size: 12px; text-align: start;">${
@@ -232,8 +250,7 @@ export function renderNganh() {
         const container = document.getElementById("nganh-buttons-container");
 
         // Lấy ma_nganh từ URL hiện tại
-        const currentMaNganh = window.location.pathname.split("/qldt/")[1];
-        
+        const currentMaNganh = window.location.pathname.split(`${baseUrl}`)[1];
 
         data.data.forEach((nganh) => {
           const button = document.createElement("button");
@@ -242,7 +259,7 @@ export function renderNganh() {
             button.style.backgroundColor = "#ad171c"; // Màu nền
             button.style.color = "white"; // Màu chữ
           }
-          if ((currentMaNganh == 0||!currentMaNganh) && nganh.ma_nganh == 1) {
+          if ((currentMaNganh == 0 || !currentMaNganh) && nganh.ma_nganh == 1) {
             button.style.backgroundColor = "#ad171c"; // Màu nền
             button.style.color = "white"; // Màu chữ
           }
@@ -257,7 +274,7 @@ export function renderNganh() {
             button.style.color = "white"; // Màu chữ
 
             // Điều hướng đến ma_nganh
-            window.location.href = `/qldt/${nganh.ma_nganh}`;
+            window.location.href = `${baseUrl}${nganh.ma_nganh}`;
           };
           container.appendChild(button);
         });
@@ -301,12 +318,108 @@ export function renderFilter(hasToken) {
 }
 
 export function attachEditSaveEvents() {
-  const editButtons = document.querySelectorAll('.btn-edit');
-  editButtons.forEach(button => {
-    button.addEventListener('click', function () {
-      editLink(button);  // Gọi hàm editLink
+  const editButtons = document.querySelectorAll(".btn-edit");
+  editButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      editLink(button); // Gọi hàm editLink
     });
   });
-
-  
 }
+
+export function renderBCTDG(data) {
+  const container = document.querySelector("#bctdg-container");
+
+  // Kiểm tra xem bảng đã tồn tại trong container hay chưa
+  const existingTable = container.querySelector("table");
+  if (existingTable) {
+    // Cập nhật nội dung bảng nếu dữ liệu thay đổi
+    updateTableContent(existingTable, data);
+    return; // Dừng tại đây nếu bảng đã tồn tại
+  }
+
+  // Tạo bảng mới nếu chưa tồn tại
+  const table = document.createElement("table");
+  table.classList.add("tablebctdg", "table-bordered", "table-striped");
+
+  // Dòng tiêu đề của bảng (các cột)
+  const titleRow = document.createElement("tr");
+  titleRow.innerHTML = `
+    <th>Mã Báo Cáo</th>
+    <th>Tên Ngành</th>
+    <th>URL</th>
+    ${
+      checkToken()
+        ? `<th style="width: auto; white-space: nowrap;">Cập nhật file</th>`
+        : ""
+    }
+  `;
+  table.appendChild(titleRow);
+
+  // Duyệt qua dữ liệu và thêm vào bảng
+  data.forEach((bcTdg) => {
+    const nganhRow = createRow(bcTdg);
+    table.appendChild(nganhRow);
+  });
+
+  container.appendChild(table);
+}
+
+// Hàm tạo một hàng mới
+function createRow(bcTdg) {
+  const nganhRow = document.createElement("tr");
+
+  const maBcTdgCell = document.createElement("td");
+  maBcTdgCell.textContent = bcTdg.ma_bc_tdg;
+  maBcTdgCell.classList.add("ma_bc_tdg");
+  nganhRow.appendChild(maBcTdgCell);
+
+  const tenNganhCell = document.createElement("td");
+  tenNganhCell.textContent = bcTdg.ten_nganh || "Không xác định";
+  nganhRow.appendChild(tenNganhCell);
+
+  const urlCell = document.createElement("td");
+  urlCell.style.textAlign = "center";
+  urlCell.innerHTML = `
+    <span class="link-text">
+      ${
+        bcTdg.url
+          ? `<a href="${bcTdg.url}" target="_blank" class="btn">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>`
+          : ""
+      }
+    </span>
+    <input type="text" value="${
+      bcTdg.url || ""
+    }" class="link" style="display: none;" />
+  `;
+  nganhRow.appendChild(urlCell);
+
+  if (checkToken()) {
+    const editButtonCell = document.createElement("td");
+    editButtonCell.innerHTML = `
+      <button class="btn-edit" style="margin-left: 5px;">
+        <i class="fa-solid fa-pen"></i> <!-- Biểu tượng bút -->
+      </button>
+      <button class="btn-save" style="margin-left: 5px; display: none;">
+        <i class="fa-solid fa-save"></i> <!-- Biểu tượng lưu -->
+      </button>
+    `;
+    nganhRow.appendChild(editButtonCell);
+  }
+
+  return nganhRow;
+}
+
+// Hàm cập nhật nội dung bảng hiện có
+function updateTableContent(table, data) {
+  const rows = table.querySelectorAll("tr:not(:first-child)"); // Bỏ qua dòng tiêu đề
+  rows.forEach((row) => row.remove()); // Xóa tất cả các hàng cũ
+
+  // Thêm dữ liệu mới
+  data.forEach((bcTdg) => {
+    const newRow = createRow(bcTdg);
+    table.appendChild(newRow);
+  });
+}
+

@@ -32,8 +32,13 @@
     </header>
 
     <div class="header-container">
-        <div class="header-left">
-            <h3><i class="fa-solid fa-bars"></i> Danh mục minh chứng</h3>
+        <div class="dropdown">
+            <button class="dropdown-button"><i class="fa-solid fa-bars"></i> Danh mục minh chứng</button>
+            <div class="dropdown-content">
+                <a href="{{ base_url }}bctdg"><i class="fa-solid fa-bars"></i> Báo cáo tự đánh giá</a>
+                <a href="{{ base_url }}"><i class="fa-solid fa-bars"></i> Danh mục minh chứng</a>
+                <a href="#"><i class="fa-solid fa-bars"></i> Minh chứng bổ sung</a>
+            </div>
         </div>
 
         <div class="header-right">
@@ -84,7 +89,7 @@
             <!-- Khu vực tải file -->
             <div class="file-upload-section" style="margin-top: 15px;">
                 <label for="file-upload" style="display: block; margin-bottom: 5px;">Tải tệp lên:</label>
-                <input type="file" id="file-upload" style="margin-bottom: 10px;" />
+                <input type="file" id="file-upload" multiple style="margin-bottom: 10px;" />
                 <button id="upload-button" class="popup-upload">Tải lên</button>
             </div>
 

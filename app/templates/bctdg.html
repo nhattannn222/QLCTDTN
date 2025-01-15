@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDU - QLCTDTN</title>
+    <link rel="stylesheet" href="{{ base_url }}static/css/styles.css">
+    <link rel="stylesheet" href="{{ base_url }}static/css/popup.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ base_url }}static/img/icon-logo.png">
+</head>
+
+<body data-base-url="{{ base_url }}">
+    <!-- Header Section -->
+    <header>
+        <img class="logo" src="{{ base_url }}static/img/logo.jpg" alt="Logo Trường Đại học Bình Dương">
+        <div class="content">
+            <div class="title">Tự đánh giá chương trình đào tạo ngành</div>
+            <div class="divider">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div class="buttons-container" id="nganh-buttons-container">
+                <!-- Các button sẽ được render vào đây -->
+            </div>
+        </div>
+        <div>
+            <button id="loginButton" class="login-button"><i class="fa-solid fa-circle-user"></i> Đăng nhập</button>
+            <button id="logoutButton" class="login-button" style="display: none;"><i
+                    class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
+        </div>
+    </header>
+
+    <div class="header-container">
+        <div class="dropdown">
+            <button class="dropdown-button"><i class="fa-solid fa-bars"></i> Báo cáo tự đánh giá</button>
+            <div class="dropdown-content">
+                <a href="{{ base_url }}bctdg"><i class="fa-solid fa-bars"></i> Báo cáo tự đánh giá</a>
+                <a href="{{ base_url }}"><i class="fa-solid fa-bars"></i> Danh mục minh chứng</a>
+                <a href="#"><i class="fa-solid fa-bars"></i> Minh chứng bổ sung</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+        <div id="bctdg-container">
+            <!-- Dữ liệu sẽ được render tại đây -->
+        </div>
+    </div>
+
+    <!-- Popup Container -->
+    <div id="popup-container" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h3>TẢI BÁO CÁO TỰ ĐÁNH GIÁ</h3>
+
+            <!-- Thông báo không có liên kết -->
+            <div id="no-links-message" style="display: none; color: red; font-size: 16px; margin-bottom: 10px;">
+                Không có liên kết nào để chọn.
+            </div>
+
+            <!-- Danh sách liên kết -->
+            <div id="popup-link-list" class="popup-link-list"></div>
+
+            <!-- Khu vực tải file -->
+            <div class="file-upload-section" style="margin-top: 15px;">
+                <label for="file-upload" style="display: block; margin-bottom: 5px;">Tải tệp lên:</label>
+                <input type="file" id="file-upload" multiple style="margin-bottom: 10px;" />
+            </div>
+
+
+
+            <!-- Nút hành động -->
+            <div class="popup-buttons">
+                <button id="popup-save" class="popup-save">Lưu</button>
+                <button id="popup-cancel" class="popup-cancel">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { checkToken, handleLogin, handleLogout, toggleLoginLogoutButtons } from '{{ base_url }}static/js/auth.js';
+        import { renderBCTDG } from '{{ base_url }}static/js/render.js';
+        import { showEditPopup } from '{{ base_url }}static/js/bctdg.js';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Truyền dữ liệu từ Flask sang JavaScript dưới dạng JSON hợp lệ
+            const data = {{ data | tojson | safe
+        }}; // Ensure this is correctly embedded by Flask
+
+        // Kiểm tra token
+        const hasToken = checkToken();
+
+        // Render dữ liệu bằng hàm renderBCTDG
+        renderBCTDG(data);
+
+        // Gắn sự kiện cho các nút "Edit" nếu chưa gắn
+        const editButtons = document.querySelectorAll('.btn-edit');
+        editButtons.forEach(button => {
+            if (!button.dataset.eventAttached) {
+                button.addEventListener('click', function () {
+                    showEditPopup(button);
+                });
+                button.dataset.eventAttached = "true"; // Đánh dấu đã gắn sự kiện
+            }
+        });
+
+        // Đảm bảo hàm login được gọi khi nút đăng nhập được nhấn
+        const loginButton = document.getElementById('loginButton');
+        if (loginButton && !loginButton.dataset.eventAttached) {
+            loginButton.addEventListener('click', handleLogin);
+            loginButton.dataset.eventAttached = "true"; // Đánh dấu đã gắn sự kiện
+        }
+
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton && !logoutButton.dataset.eventAttached) {
+            logoutButton.addEventListener('click', handleLogout);
+            logoutButton.dataset.eventAttached = "true"; // Đánh dấu đã gắn sự kiện
+        }
+
+        // Gọi hàm toggleLoginLogoutButtons khi trang được tải
+        toggleLoginLogoutButtons();
+        });
+    </script>
+
+
+</body>
+
+</html>

@@ -5,7 +5,7 @@ if (baseUrl !== "/qldt/") {
 
 import { showMessage } from "./floating_message.js";
 
-function showPopup(saveCallback, maMinhChung, currentLink = "") {
+function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
   const popup = document.getElementById("popup-container");
   const saveButton = document.getElementById("popup-save");
   const cancelButton = document.getElementById("popup-cancel");
@@ -17,7 +17,7 @@ function showPopup(saveCallback, maMinhChung, currentLink = "") {
   let selectedLinks = []; // Lưu danh sách các liên kết được chọn
   let folderUrl = ""; // Lưu URL của thư mục
 
-  fetch(`${baseUrl}api/v1/get_links?folder_name=${maMinhChung}`)
+  fetch(`${baseUrl}api/v1/get_links?folder_id=${maFolder}`)
     .then((response) => response.json())
     .then((data) => {
       if (data.files.length === 0) {
@@ -30,35 +30,30 @@ function showPopup(saveCallback, maMinhChung, currentLink = "") {
         saveButton.disabled = false;
       }
 
-      // Gắn giá trị folder_url từ API trả về
       folderUrl = data.folder_url || "";
 
       linkListContainer.innerHTML = "";
 
-      const isCurrentFolder = currentLink === folderUrl; // Kiểm tra nếu currentLink là folder
+      const isCurrentFolder = currentLink === folderUrl;
 
       data.files.forEach((link) => {
         const linkItem = document.createElement("div");
         linkItem.classList.add("link-item");
         linkItem.textContent = `Tên tệp: ${link.name}`;
 
-        // Nếu currentLink là folder, chọn tất cả các linkItem
         if (isCurrentFolder) {
           linkItem.classList.add("selected");
           selectedLinks.push(link.url);
         } else if (currentLink && currentLink.includes(link.url)) {
-          // Nếu currentLink là một liên kết cụ thể
           linkItem.classList.add("selected");
           selectedLinks.push(link.url);
         }
 
         linkItem.addEventListener("click", () => {
           if (linkItem.classList.contains("selected")) {
-            // Bỏ chọn liên kết
             linkItem.classList.remove("selected");
             selectedLinks = selectedLinks.filter((url) => url !== link.url);
           } else {
-            // Chọn liên kết
             linkItem.classList.add("selected");
             selectedLinks.push(link.url);
           }
@@ -74,66 +69,73 @@ function showPopup(saveCallback, maMinhChung, currentLink = "") {
       showMessage("Không thể tải danh sách liên kết từ Google Drive.", "error");
     });
 
-    const handleUpload = () => {
-      const files = fileInput.files; // Lấy danh sách các file được chọn
-      if (files.length > 0) {
-        const apiUrl = `${baseUrl}api/v1/upload_file?folder_name=${maMinhChung}`;
-        const uploadPromises = []; // Danh sách các promise để tải từng file
-    
-        // Duyệt qua từng file và tạo promise để tải lên
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const formData = new FormData();
-          formData.append("file", file);
-    
-          const uploadPromise = fetch(apiUrl, {
-            method: "POST",
-            body: formData,
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.file_id) {
-                showMessage(`Tải file "${file.name}" lên thành công!`, "success");
-              } else {
-                showMessage(`Tải file "${file.name}" lên thất bại!`, "error");
-              }
-            })
-            .catch((error) => {
-              console.error(`Error uploading file "${file.name}":`, error);
-              showMessage(
-                `Có lỗi xảy ra khi tải file "${file.name}" lên.`,
-                "error"
-              );
-            });
-    
-          uploadPromises.push(uploadPromise);
-        }
-    
-        // Chờ tất cả các file được tải lên
-        Promise.all(uploadPromises).then(() => {
-          // Làm mới danh sách liên kết sau khi tải lên xong
-          showPopup(saveCallback, maMinhChung);
-          // Xóa nội dung của fileInput
-          fileInput.value = "";
-        });
-      } else {
-        showMessage("Vui lòng chọn ít nhất một file để tải lên!", "error");
+  const handleUpload = () => {
+    const files = fileInput.files;
+    if (files.length > 0) {
+      const urlParams = new URL(window.location.href);
+      const pathParts = urlParams.pathname.split("/");
+      const maNganh = pathParts[pathParts.length - 1];
+
+      if (!maNganh || isNaN(maNganh)) {
+        showMessage("Mã ngành không hợp lệ!", "error");
+        return;
       }
-    };
-    
+
+      const apiUrl = `${baseUrl}api/v1/upload_file?folder_id=${maFolder}`;
+      const uploadPromises = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const uploadPromise = fetch(apiUrl, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.file_id) {
+              showMessage(`Tải file "${file.name}" lên thành công!`, "success");
+            } else {
+              showMessage(`Tải file "${file.name}" lên thất bại!`, "error");
+            }
+          })
+          .catch((error) => {
+            console.error(`Error uploading file "${file.name}":`, error);
+            showMessage(`Có lỗi xảy ra khi tải file "${file.name}" lên.`, "error");
+          });
+
+        uploadPromises.push(uploadPromise);
+      }
+
+      // Chờ tất cả các file được tải lên
+      Promise.all(uploadPromises)
+        .then(() => {
+          showPopup(saveCallback, maMinhChung, maFolder);
+          fileInput.value = "";
+        })
+        .catch((error) => {
+          console.error("Error during file uploads:", error);
+          showMessage("Có lỗi xảy ra khi tải lên các tệp.", "error");
+        });
+    } else {
+      showMessage("Vui lòng chọn ít nhất một file để tải lên!", "error");
+    }
+  };
 
   uploadButton.addEventListener("click", handleUpload);
 
   const onSave = () => {
     let finalLink = "";
     if (selectedLinks.length === 1) {
-      finalLink = selectedLinks[0]; // Nếu chỉ chọn 1 liên kết, sử dụng liên kết đó
+      finalLink = selectedLinks[0];
     } else if (selectedLinks.length > 1) {
-      finalLink = folderUrl; // Nếu nhiều hơn 1 liên kết, gán folder_url từ API
+      finalLink = folderUrl;
     }
 
     if (finalLink) {
-      saveCallback(finalLink); // Gọi callback với liên kết cuối cùng
+      saveCallback(finalLink);
       hidePopup();
     } else {
       showMessage("Vui lòng chọn ít nhất một liên kết!", "error");
@@ -157,6 +159,17 @@ export function editLink(button) {
   const maMinhChungCon = row
     .querySelector(".ma_minh_chung_con")
     .textContent.trim();
+  let maFolder = row.querySelector(".folderUrl").textContent.trim();
+  const regex = /\/folders\/([a-zA-Z0-9_-]+)/;
+  const match = maFolder.match(regex);
+
+  if (match && match[1]) {
+    maFolder = match[1];
+  } else {
+    showMessage("Không tìm thấy mã thư mục.", "error");
+    return;
+  }
+
   const linkText =
     row.querySelector(".link-text").querySelector("a")?.href || "";
   const maMinhChung = row
@@ -172,14 +185,15 @@ export function editLink(button) {
     showMessage("Không tìm thấy mã minh chứng!", "error");
     return;
   }
-  // Hiển thị popup và xử lý lưu link
+
   showPopup(
     (newLink) => {
-      saveLinkAPI(maMinhChungCon, newLink); // Truyền cả maMinhChung và maMinhChungCon
+      saveLinkAPI(maMinhChungCon, newLink);
     },
     maMinhChung,
+    maFolder,
     linkText
-  ); // Truyền maMinhChung vào showPopup
+  );
 }
 
 // Hàm gửi API để lưu link
@@ -206,8 +220,8 @@ function saveLinkAPI(maMinhChungCon, newLink) {
       if (data.status === 200) {
         showMessage(data.message, "success");
         setTimeout(() => {
-          location.reload(); // Reload trang sau 2 giây
-        }, 1000); // 2000 milliseconds = 2 seconds
+          location.reload();
+        }, 1000);
       } else {
         showMessage("Cập nhật thất bại!", "error");
       }
@@ -217,6 +231,7 @@ function saveLinkAPI(maMinhChungCon, newLink) {
       showMessage("Cập nhật thất bại!", "error");
     });
 }
+
 // Hàm lấy giá trị của cookie theo tên
 function getCookie(name) {
   const value = `; ${document.cookie}`;

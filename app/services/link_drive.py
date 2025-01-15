@@ -64,7 +64,6 @@ def get_folder_id_by_name(service, folder_name, drive_id=None):
 
 
 
-
 # Hàm liệt kê các tệp trong thư mục Google Drive
 def list_files_in_folder(service, folder_id):
     query = f"'{folder_id}' in parents and trashed = false"
