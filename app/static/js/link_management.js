@@ -6,13 +6,47 @@ if (baseUrl !== "/qldt/") {
 import { showMessage } from "./floating_message.js";
 
 function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
-  const popup = document.getElementById("popup-container");
+  // Xóa popup-container cũ nếu tồn tại
+  const existingPopup = document.getElementById("popup-container");
+  if (existingPopup) {
+    existingPopup.remove();
+  }
+
+  // Tạo lại popup-container
+  const popupContainer = document.createElement("div");
+  popupContainer.id = "popup-container";
+  popupContainer.className = "popup-overlay";
+  popupContainer.style.display = "flex"; // Hoặc "block" tùy thuộc vào cách bạn muốn hiển thị
+
+  // Nội dung của popup
+  popupContainer.innerHTML = `
+    <div class="popup-content">
+      <h3>Chỉnh sửa link</h3>
+      <div id="no-links-message" style="display: none; color: red; font-size: 16px; margin-bottom: 10px;">
+        Không có liên kết nào để chọn.
+      </div>
+      <div id="popup-link-list" class="popup-link-list"></div>
+      <div class="file-upload-section" style="margin-top: 15px;">
+        <label for="file-upload" style="display: block; margin-bottom: 5px;">Tải tệp lên:</label>
+        <input type="file" id="file-upload" multiple style="margin-bottom: 10px;" />
+        <label for="folder-upload" style="display: block; margin-bottom: 5px;">Tải thư mục lên:</label>
+        <input type="file" id="folder-upload" webkitdirectory multiple style="margin-bottom: 10px;" />
+        <button id="upload-button" class="popup-upload">Tải lên</button>
+      </div>
+      <div class="popup-buttons">
+        <button id="popup-save" class="popup-save">Lưu</button>
+        <button id="popup-delete" class="popup-delete">Xóa</button>
+        <button id="popup-cancel" class="popup-cancel">Hủy</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(popupContainer);
+
+  // Gắn sự kiện cho các nút trong popup
   const saveButton = document.getElementById("popup-save");
+  const deleteButton = document.getElementById("popup-delete");
   const cancelButton = document.getElementById("popup-cancel");
-  const linkListContainer = document.getElementById("popup-link-list");
-  const noLinksMessage = document.getElementById("no-links-message");
-  const fileInput = document.getElementById("file-upload");
-  const uploadButton = document.getElementById("upload-button");
 
   let selectedLinks = []; // Lưu danh sách các liên kết được chọn
   let folderUrl = ""; // Lưu URL của thư mục
@@ -20,26 +54,27 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
   fetch(`${baseUrl}api/v1/get_links?folder_id=${maFolder}`)
     .then((response) => response.json())
     .then((data) => {
-      if (data.files.length === 0) {
-        noLinksMessage.style.display = "block";
-        linkListContainer.style.display = "none";
+      if (data.items.length === 0) {
+        document.getElementById("no-links-message").style.display = "block";
+        document.getElementById("popup-link-list").style.display = "none";
         saveButton.disabled = true;
       } else {
-        noLinksMessage.style.display = "none";
-        linkListContainer.style.display = "block";
+        document.getElementById("no-links-message").style.display = "none";
+        document.getElementById("popup-link-list").style.display = "block";
         saveButton.disabled = false;
       }
 
       folderUrl = data.folder_url || "";
 
-      linkListContainer.innerHTML = "";
+      document.getElementById("popup-link-list").innerHTML = "";
 
       const isCurrentFolder = currentLink === folderUrl;
 
-      data.files.forEach((link) => {
+      data.items.forEach((link) => {
         const linkItem = document.createElement("div");
         linkItem.classList.add("link-item");
-        linkItem.textContent = `Tên tệp: ${link.name}`;
+        linkItem.textContent =
+          link.type == "File" ? `Tệp: ${link.name}` : `Folder: ${link.name}`;
 
         if (isCurrentFolder) {
           linkItem.classList.add("selected");
@@ -59,72 +94,184 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
           }
         });
 
-        linkListContainer.appendChild(linkItem);
+        document.getElementById("popup-link-list").appendChild(linkItem);
       });
-
-      popup.style.display = "flex";
     })
     .catch((error) => {
       console.error("Error fetching Google Drive links:", error);
       showMessage("Không thể tải danh sách liên kết từ Google Drive.", "error");
     });
 
-  const handleUpload = () => {
-    const files = fileInput.files;
-    if (files.length > 0) {
-      const urlParams = new URL(window.location.href);
-      const pathParts = urlParams.pathname.split("/");
-      const maNganh = pathParts[pathParts.length - 1];
+  const handleUpload = async () => {
+    const folderInput = document.getElementById("folder-upload");
+    const fileInput = document.getElementById("file-upload");
 
-      if (!maNganh || isNaN(maNganh)) {
-        showMessage("Mã ngành không hợp lệ!", "error");
-        return;
+    // Kiểm tra nếu không có file nào được chọn
+    if (
+      (!folderInput || !folderInput.files || folderInput.files.length === 0) &&
+      (!fileInput || !fileInput.files || fileInput.files.length === 0)
+    ) {
+      showMessage("Vui lòng chọn file hoặc thư mục để tải lên!", "error");
+      return;
+    }
+
+    let rootFolderId = maFolder; // Thư mục gốc trên Google Drive
+
+    try {
+      // Xử lý thư mục (nếu có)
+      if (folderInput.files.length > 0) {
+        await handleFolderUpload(folderInput.files, rootFolderId);
       }
 
-      const apiUrl = `${baseUrl}api/v1/upload_file?folder_id=${maFolder}`;
-      const uploadPromises = [];
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const uploadPromise = fetch(apiUrl, {
-          method: "POST",
-          body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.file_id) {
-              showMessage(`Tải file "${file.name}" lên thành công!`, "success");
-            } else {
-              showMessage(`Tải file "${file.name}" lên thất bại!`, "error");
-            }
-          })
-          .catch((error) => {
-            console.error(`Error uploading file "${file.name}":`, error);
-            showMessage(`Có lỗi xảy ra khi tải file "${file.name}" lên.`, "error");
-          });
-
-        uploadPromises.push(uploadPromise);
+      // Xử lý file riêng lẻ (nếu có)
+      if (fileInput.files.length > 0) {
+        await handleFileUpload(fileInput.files, rootFolderId);
       }
 
-      // Chờ tất cả các file được tải lên
-      Promise.all(uploadPromises)
-        .then(() => {
-          showPopup(saveCallback, maMinhChung, maFolder);
-          fileInput.value = "";
-        })
-        .catch((error) => {
-          console.error("Error during file uploads:", error);
-          showMessage("Có lỗi xảy ra khi tải lên các tệp.", "error");
-        });
-    } else {
-      showMessage("Vui lòng chọn ít nhất một file để tải lên!", "error");
+      showPopup(saveCallback, maMinhChung, rootFolderId);
+      folderInput.value = "";
+      fileInput.value = "";
+    } catch (error) {
+      console.error("❌ Lỗi trong quá trình tải lên:", error);
+      showMessage("Có lỗi xảy ra khi tải file/thư mục lên.", "error");
     }
   };
 
-  uploadButton.addEventListener("click", handleUpload);
+  /** 🗂️ Xử lý upload thư mục */
+  const handleFolderUpload = async (folderFiles, rootFolderId) => {
+    const { folderMap, filesToUpload } = await processFiles(folderFiles);
+
+    // Tạo thư mục trên Google Drive
+    await createFoldersOnDrive(folderMap, rootFolderId);
+
+    // Upload file vào thư mục tương ứng
+    await uploadFilesToDrive(filesToUpload, folderMap, rootFolderId);
+  };
+
+  /** 📂 Xử lý upload file riêng lẻ */
+  const handleFileUpload = async (singleFiles, rootFolderId) => {
+    const filesToUpload = Array.from(singleFiles).map((file) => ({
+      file,
+      folderPath: "", // Không có thư mục con
+    }));
+
+    // Upload file vào thư mục gốc
+    await uploadFilesToDrive(filesToUpload, {}, rootFolderId);
+  };
+
+  /** 🔍 Xử lý danh sách file từ thư mục */
+  const processFiles = async (folderFiles) => {
+    const folderMap = {};
+    let filesToUpload = [];
+
+    for (let file of folderFiles) {
+      const relativePath = file.webkitRelativePath;
+      const pathParts = relativePath.split("/");
+      pathParts.pop(); // Loại bỏ tên file, chỉ giữ thư mục
+      const folderPath = pathParts.join("/");
+
+      if (folderPath && !folderMap[folderPath]) {
+        folderMap[folderPath] = null; // Đánh dấu thư mục cần tạo
+      }
+
+      filesToUpload.push({ file, folderPath });
+    }
+
+    return { folderMap, filesToUpload };
+  };
+
+  /** 🏗️ Tạo thư mục trên Google Drive */
+  const createFoldersOnDrive = async (folderMap, rootFolderId) => {
+    let folderPathList = Object.keys(folderMap);
+    folderPathList.sort((a, b) => a.split("/").length - b.split("/").length);
+
+    for (const folderPath of folderPathList) {
+      if (!folderPath.trim()) continue;
+
+      const pathParts = folderPath.split("/");
+      let parentFolderId = rootFolderId;
+      let currentPath = "";
+
+      for (const folderName of pathParts) {
+        if (!folderName.trim()) continue;
+
+        currentPath = currentPath ? `${currentPath}/${folderName}` : folderName;
+
+        if (!folderMap[currentPath]) {
+          const response = await fetch(`${baseUrl}api/v1/create_folder`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              parent_folder_id: parentFolderId,
+              folder_name: folderName.trim(),
+            }),
+          });
+
+          const data = await response.json();
+          if (data.folder_id) {
+            folderMap[currentPath] = data.folder_id;
+            parentFolderId = data.folder_id;
+          } else {
+            showMessage(`❌ Không thể tạo thư mục "${folderName}".`, "error");
+            return;
+          }
+        } else {
+          parentFolderId = folderMap[currentPath];
+        }
+      }
+    }
+  };
+
+  /** 📤 Upload file lên Google Drive */
+  const uploadFilesToDrive = async (filesToUpload, folderMap, rootFolderId) => {
+    let uploadPromises = filesToUpload.map(({ file, folderPath }) => {
+      let parentFolderId = rootFolderId;
+
+      if (folderPath) {
+        let fullPath = folderPath
+          .split("/")
+          .map((_, idx, arr) => arr.slice(0, idx + 1).join("/"))
+          .reverse();
+
+        for (const path of fullPath) {
+          if (folderMap[path]) {
+            parentFolderId = folderMap[path];
+            break;
+          }
+        }
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      return fetch(`${baseUrl}api/v1/upload_file?folder_id=${parentFolderId}`, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.file_id) {
+            showMessage(
+              `✅ Tải file "${file.name}" lên thành công!`,
+              "success"
+            );
+          } else {
+            showMessage(`❌ Tải file "${file.name}" thất bại!`, "error");
+          }
+        })
+        .catch((error) => {
+          console.error(`⚠️ Lỗi khi tải file "${file.name}":`, error);
+          showMessage(`Lỗi khi tải file "${file.name}" lên.`, "error");
+        });
+    });
+
+    await Promise.all(uploadPromises);
+  };
+
+  if (!document.getElementById("upload-button").dataset.listenerAdded) {
+    document.getElementById("upload-button").addEventListener("click", handleUpload);
+    document.getElementById("upload-button").dataset.listenerAdded = "true"; // Đánh dấu đã thêm sự kiện
+  }
 
   const onSave = () => {
     let finalLink = "";
@@ -142,14 +289,91 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
     }
   };
 
-  saveButton.addEventListener("click", onSave);
-  cancelButton.addEventListener("click", hidePopup);
+  if (!saveButton.dataset.listenerAdded) {
+    saveButton.addEventListener("click", onSave);
+    saveButton.dataset.listenerAdded = "true"; // Đánh dấu đã thêm sự kiện
+  }
+
+  const onDelete = () => {
+    console.log(selectedLinks);
+
+    if (selectedLinks.length === 0) {
+      showMessage("Vui lòng chọn ít nhất một liên kết để xóa!", "error");
+      return;
+    }
+
+    const confirmDelete = confirm(
+      "Bạn có chắc chắn muốn xóa các liên kết đã chọn?"
+    );
+    if (!confirmDelete) return;
+
+    selectedLinks.forEach((link) => {
+      const fileId = extractFileId(link);
+      if (fileId) {
+        deleteLinkAPI(fileId);
+      } else {
+        showMessage(`Không thể xác định fileId từ link: ${link}`, "error");
+      }
+    });
+
+    hidePopup();
+  };
+
+  if (!deleteButton.dataset.listenerAdded) {
+    deleteButton.addEventListener("click", onDelete);
+    deleteButton.dataset.listenerAdded = "true"; // Đánh dấu đã thêm sự kiện
+  }
+
+  if (!cancelButton.dataset.listenerAdded) {
+    cancelButton.addEventListener("click", hidePopup);
+    cancelButton.dataset.listenerAdded = "true"; // Đánh dấu đã thêm sự kiện
+  }
+  
+  function extractFileId(url) {
+    const match = url.match(/(?:\/d\/|\/folders\/)([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : null;
+}
+
+  function deleteLinkAPI(fileId) {
+    const token = getCookie("token");
+    if (!token) {
+      showMessage("Bạn chưa đăng nhập hoặc token không hợp lệ.", "error");
+      return;
+    }
+
+    const apiUrl = `${baseUrl}api/v1/delete_file`;
+    const requestData = { file_id: fileId };
+
+    fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(requestData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          showMessage(`Xóa thành công file ID: ${fileId}`, "success");
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          showMessage(`Xóa thất bại: ${data.message}`, "error");
+        }
+      })
+      .catch((error) => {
+        console.error("Lỗi khi gọi API xóa:", error);
+        showMessage("Có lỗi xảy ra khi xóa!", "error");
+      });
+  }
 
   function hidePopup() {
-    popup.style.display = "none";
-    saveButton.removeEventListener("click", onSave);
-    cancelButton.removeEventListener("click", hidePopup);
-    uploadButton.removeEventListener("click", handleUpload);
+    const popup = document.getElementById("popup-container");
+    if (popup) {
+      popup.remove(); // Thay đổi từ hidePopup thành remove
+    }
   }
 }
 
@@ -184,6 +408,12 @@ export function editLink(button) {
   if (!maMinhChung) {
     showMessage("Không tìm thấy mã minh chứng!", "error");
     return;
+  }
+
+  // Xóa popup-container cũ nếu tồn tại
+  const existingPopup = document.getElementById("popup-container");
+  if (existingPopup) {
+    existingPopup.remove();
   }
 
   showPopup(
