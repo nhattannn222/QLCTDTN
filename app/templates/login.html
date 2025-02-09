@@ -61,8 +61,13 @@
 
                 if (result.success) {
                     showMessage("Đăng nhập thành công!");
+                    
                     setTimeout(() => {
-                        window.location.href = baseUrl; // Chuyển hướng nếu đăng nhập thành công
+                        // Kiểm tra giá trị ma_nganh
+                        const redirectUrl = result.data.user.ma_nganh !== 0 
+                            ? `${baseUrl}${result.data.user.ma_nganh}` 
+                            : `${baseUrl}1`; // Nếu ma_nganh = 0, chỉ chuyển hướng đến baseUrl
+                        window.location.href = redirectUrl; // Chuyển hướng
                     }, 500); // Delay 0.5 giây
                 } else {
                     showMessage(`Đăng nhập thất bại \n ${result.message}`, "error");
