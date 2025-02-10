@@ -449,9 +449,9 @@ function saveLinkAPI(maMinhChungCon, newLink) {
     .then((data) => {
       if (data.status === 200) {
         showMessage(data.message, "success");
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+        // setTimeout(() => {
+        //   location.reload();
+        // }, 1000);
       } else {
         showMessage("Cập nhật thất bại!", "error");
       }
