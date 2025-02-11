@@ -462,7 +462,15 @@ function saveLinkAPI(maMinhChungCon, newLink) {
           if (linkElement) {
             linkElement.href = newLink;
             linkElement.textContent = newLink;
-          } else {
+            row.querySelector(
+              ".link-text"
+            ).innerHTML = `<span class="link-text">
+                              ${`<a href="${newLink}" target="_blank" class="btn">
+                                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>`
+                              }
+                          </span>`;
+          }else{
             row.querySelector(
               ".link-text"
             ).innerHTML = `<span class="link-text">
