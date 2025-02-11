@@ -269,7 +269,9 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
   };
 
   if (!document.getElementById("upload-button").dataset.listenerAdded) {
-    document.getElementById("upload-button").addEventListener("click", handleUpload);
+    document
+      .getElementById("upload-button")
+      .addEventListener("click", handleUpload);
     document.getElementById("upload-button").dataset.listenerAdded = "true"; // Đánh dấu đã thêm sự kiện
   }
 
@@ -328,11 +330,11 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
     cancelButton.addEventListener("click", hidePopup);
     cancelButton.dataset.listenerAdded = "true"; // Đánh dấu đã thêm sự kiện
   }
-  
+
   function extractFileId(url) {
     const match = url.match(/(?:\/d\/|\/folders\/)([a-zA-Z0-9_-]+)/);
     return match ? match[1] : null;
-}
+  }
 
   function deleteLinkAPI(fileId) {
     const token = getCookie("token");
@@ -449,9 +451,28 @@ function saveLinkAPI(maMinhChungCon, newLink) {
     .then((data) => {
       if (data.status === 200) {
         showMessage(data.message, "success");
-        // setTimeout(() => {
-        //   location.reload();
-        // }, 1000);
+        // Cập nhật lại nội dung linkText
+        const rows = document.querySelectorAll(".ma_minh_chung_con");
+        const row = Array.from(rows)
+          .find((el) => el.textContent.trim() === maMinhChungCon)
+          ?.closest("tr");
+
+        if (row) {
+          const linkElement = row.querySelector(".link-text a");
+          if (linkElement) {
+            linkElement.href = newLink;
+            linkElement.textContent = newLink;
+          } else {
+            row.querySelector(
+              ".link-text"
+            ).innerHTML = `<span class="link-text">
+                              ${`<a href="${newLink}" target="_blank" class="btn">
+                                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>`
+                              }
+                          </span>`;
+          }
+        }
       } else {
         showMessage("Cập nhật thất bại!", "error");
       }
