@@ -11,9 +11,9 @@ services:
     environment:
       - MYSQL_HOST=mysql  
       - MYSQL_USER=root
-      - MYSQL_PASSWORD=
+      - MYSQL_PASSWORD=${qlctdtn_MYSQL_PASSWORD}
       - MYSQL_DB=bdu_qlctdtn
-      - SECRET_KEY=
+      - SECRET_KEY=${qlctdtn_SECRET_KEY}
       - BASE_URL=/qldt/
     depends_on:
       - mysql 
@@ -25,7 +25,7 @@ services:
     ports:
       - "3308:3306"  # Map cổng 3306 của container tới cổng 3307 trên máy chủ
     environment:
-      MYSQL_ROOT_PASSWORD: 
+      MYSQL_ROOT_PASSWORD: ${qlctdtn_MYSQL_PASSWORD}
       MYSQL_DATABASE: bdu_qlctdtn
     volumes:
       - mysql_data:/var/lib/mysql  # Volume lưu trữ dữ liệu MySQL
