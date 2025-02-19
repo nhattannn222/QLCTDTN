@@ -287,7 +287,8 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
       saveCallback(finalLink);
       hidePopup();
     } else {
-      showMessage("Vui lòng chọn ít nhất một liên kết!", "error");
+      saveCallback("");
+      hidePopup();
     }
   };
 
@@ -462,24 +463,22 @@ function saveLinkAPI(maMinhChungCon, newLink) {
           if (linkElement) {
             linkElement.href = newLink;
             linkElement.textContent = newLink;
-            row.querySelector(
-              ".link-text"
-            ).innerHTML = `<span class="link-text">
-                              ${`<a href="${newLink}" target="_blank" class="btn">
-                                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </a>`
-                              }
-                          </span>`;
-          }else{
-            row.querySelector(
-              ".link-text"
-            ).innerHTML = `<span class="link-text">
-                              ${`<a href="${newLink}" target="_blank" class="btn">
-                                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </a>`
-                              }
-                          </span>`;
-          }
+        }
+        
+        const linkTextElement = row.querySelector(".link-text");
+        
+        if (newLink.trim() !== "") {
+            linkTextElement.innerHTML = `
+                <span class="link-text">
+                    <a href="${newLink}" target="_blank" class="btn">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </span>
+            `;
+        } else {
+            linkTextElement.innerHTML = ""; // Xóa nội dung nếu newLink rỗng
+        }
+        
         }
       } else {
         showMessage("Cập nhật thất bại!", "error");
