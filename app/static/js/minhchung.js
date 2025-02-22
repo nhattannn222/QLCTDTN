@@ -86,7 +86,7 @@ function hidePopup() {
 
 async function deleteMinhChung(maMinhChungCon) {
   try {
-    const response = await fetch(`/api/v1/minh_chung_con/${maMinhChungCon}`, {
+    const response = await fetch(`${baseUrl}/api/v1/minh_chung_con/${maMinhChungCon}`, {
       method: "POST",
     });
 
@@ -114,7 +114,7 @@ export async function editMC(button) {
   }
 
   try {
-    const response = await fetch(`/api/v1/minh_chung_con/${maMinhChungCon}`);
+    const response = await fetch(`${baseUrl}/api/v1/minh_chung_con/${maMinhChungCon}`);
     const result = await response.json();
 
     if (!response.ok) {
@@ -149,7 +149,7 @@ async function updateMinhChung(data, updatedData) {
         return;
     }
 
-    const response = await fetch(`/api/v1/minh_chung_con/${data.ma_minh_chung_con}`, {
+    const response = await fetch(`${baseUrl}/api/v1/minh_chung_con/${data.ma_minh_chung_con}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
