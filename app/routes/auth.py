@@ -33,6 +33,7 @@ def login_route():
 
         # Lưu token vào cookie, với thời gian hết hạn là 1 giờ
         response.set_cookie('token', user.token, max_age=datetime.timedelta(hours=1))
+        response.set_cookie('role', user.vai_tro, max_age=datetime.timedelta(hours=1))
 
         # Trả về phản hồi
         return response

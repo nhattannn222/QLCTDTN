@@ -110,6 +110,7 @@
     <script type="module">
         import { checkToken, handleLogin, handleLogout, toggleLoginLogoutButtons } from '{{ base_url }}static/js/auth.js';
         import { editLink } from '{{ base_url }}static/js/link_management.js';
+        import { editMC } from '{{ base_url }}static/js/minhchung.js';
         import { renderPage, renderPagination, renderTables, renderNganh, renderFilter, attachEditSaveEvents } from '{{ base_url }}static/js/render.js';
         import { filterMinhChung, filterByLink, resetFilter } from '{{ base_url }}static/js/filter.js';
         import { populateDropdown, populateDropdownTieuChi } from '{{ base_url }}static/js/dropdown.js';
@@ -181,6 +182,13 @@
         editButtons.forEach(button => {
             button.addEventListener('click', function () {
                 editLink(button);
+            });
+        });
+
+        const editMCButtons = document.querySelectorAll('.btn-view');
+        editMCButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                editMC(button);
             });
         });
 

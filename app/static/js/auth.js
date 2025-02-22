@@ -45,6 +45,7 @@ export function handleLogin() {
 export function handleLogout() {
     // Xóa cookie "token"
     document.cookie = 'token=; max-age=0; path=/'; // max-age=0 sẽ làm cookie hết hạn ngay lập tức
+    document.cookie = 'role=; max-age=0; path=/'; // max-age=0 sẽ làm cookie hết hạn ngay lập tức
     console.log("Cookie token đã bị xóa");
 
     // Cập nhật giao diện (ẩn nút Đăng nhập, hiển thị nút Đăng xuất)

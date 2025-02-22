@@ -362,6 +362,18 @@ th:nth-child(1), td:nth-child(1) {
     background-color: #ad171c;
     color: #ffffff;
 }
+.btn-view {
+    padding: 5px 10px;
+    border: #ad171c solid 2px;
+    color: #ad171c;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-view:hover {
+    background-color: #ad171c;
+    color: #ffffff;
+}
+
 .link{
     width: 150px; 
     padding: 5px; 
@@ -439,3 +451,42 @@ th:nth-child(1), td:nth-child(1) {
     transition: background-color 0.3s, color 0.3s;
     text-align: center;
 }
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+  }
+  
+  .popup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .popup-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .popup-buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .popup-buttons button {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .popup-save { background-color: #28a745; color: white; }
+  .popup-delete { background-color: #dc3545; color: white; }
+  .popup-cancel { background-color: #6c757d; color: white; }
+  

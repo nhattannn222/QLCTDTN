@@ -3,7 +3,7 @@ import os
 import logging
 from flask import Blueprint, jsonify, request
 from app.services.nganh import getNganh
-from app.services.minh_chung_con import update_link
+from app.services.minh_chung_con import update_link, updateMC, getMC, deleteMC
 from app.services.data_service import get_bctdg, updateURLbctdg
 from app.middlewares.authorize import authorize
 from googleapiclient.http import MediaIoBaseUpload
@@ -243,3 +243,62 @@ def delete_folder():
     result = delete_file_or_folder(service, folder_id)
 
     return jsonify(result)
+
+
+@data_bp.route('/api/v1/minh_chung_con/<int:ma_minh_chung_con>', methods=['PUT'])
+@authorize
+def update_MC(ma_minh_chung_con):
+    # Lấy dữ liệu từ request
+    data = request.get_json()
+    
+    ma_minh_chung_con = ma_minh_chung_con
+    ten_minh_chung = data['ten_minh_chung']
+    so_minh_chung = data['so_minh_chung'] 
+    ngay_ban_hanh = data['ngay_ban_hanh']
+    noi_ban_hanh = data['noi_ban_hanh']
+    
+
+    # Kiểm tra xem dữ liệu có hợp lệ không
+    if not data or not ten_minh_chung or not noi_ban_hanh or not noi_ban_hanh:
+        return jsonify({'status': 400, 'message': 'Thiếu thông tin cần thiết!'}), 400
+
+    try:
+        # Gọi service để cập nhật link
+        updated_minh_chung_con = updateMC(ma_minh_chung_con, ten_minh_chung,so_minh_chung, ngay_ban_hanh, noi_ban_hanh)
+
+        # Kiểm tra xem bản ghi có được cập nhật không
+        if not updated_minh_chung_con:
+            return jsonify({'status': 404, 'message': 'Không tìm thấy Minh Chứng Con để cập nhật'}), 404
+
+        return jsonify({
+            'status': 200,
+            'message': 'Cập nhật minh chứng thành công',
+            'data': updated_minh_chung_con.to_dict()  # Trả về dữ liệu đã cập nhật dưới dạng dict
+        }), 200
+    except Exception as e:
+        # Trả về lỗi nếu có bất kỳ sự cố nào
+        return jsonify({'status': 500, 'message': f'Lỗi server: {str(e)}'}), 500
+    
+    
+@data_bp.route('/api/v1/minh_chung_con/<int:ma_minh_chung_con>', methods=['GET'])
+def get_minh_chung_con(ma_minh_chung_con):
+    try:
+        data = getMC(ma_minh_chung_con)
+        return jsonify({'status': 200, 'message': 'Lấy thông tin thành công', 'data': data}), 200
+    except Exception as e:
+        return jsonify({'status': 500, 'message': f'Lỗi server: {str(e)}'}), 500
+    
+@data_bp.route('/api/v1/minh_chung_con/<int:ma_minh_chung_con>', methods=['POST'])
+@authorize
+def delete_minh_chung_con(ma_minh_chung_con):
+    try:
+        # Gọi service để xóa minh chứng
+        result = deleteMC(ma_minh_chung_con)
+
+        if result:
+            return jsonify({'status': 200, 'message': 'Xóa thành công'}), 200
+        else:
+            return jsonify({'status': 404, 'message': 'Không tìm thấy minh chứng'}), 404
+    except Exception as e:
+        return jsonify({'status': 500, 'message': f'Lỗi server: {str(e)}'}), 500
+

@@ -125,3 +125,145 @@
 .popup-delete:hover {
     background-color: darkred;
 }
+
+
+/* Overlay mờ nền */
+.popup-overlay_mc {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  /* Nội dung popup */
+  .popup-content_mc {
+    background: white;
+    padding: 20px;
+    width: 500px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    animation: fadeIn_mc 0.3s ease-in-out;
+  }
+  
+  /* Tiêu đề popup */
+  .popup-content_mc h3 {
+    margin-top: 0;
+    font-size: 18px;
+    text-align: center;
+  }
+  
+  /* Form trong popup */
+  .popup-form_mc {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* Nhãn */
+  .popup-form_mc label {
+    font-weight: bold;
+    font-size: 14px;
+  }
+  
+  /* Input & Textarea */
+  .popup-input_mc {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  /* Textarea có thể thay đổi chiều cao */
+  .popup-input_mc[type="text"],
+  .popup-input_mc textarea {
+    resize: vertical;
+    min-height: 40px;
+  }
+
+  .popup-input_mc {
+    width: 100%; /* Đảm bảo full width */
+    min-height: 100px; /* Chiều cao tối thiểu */
+    max-height: 300px; /* Giới hạn chiều cao tối đa */
+    overflow-y: hidden; /* Ẩn thanh cuộn dọc */
+    resize: none; /* Không cho phép kéo thủ công */
+
+    /* BẮT BUỘC ĐỂ XUỐNG DÒNG */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+  
+  /* Nhóm nút bấm */
+  .popup-buttons_mc {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+  
+  /* Style chung cho các nút */
+  .popup-buttons_mc button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  
+  /* Nút Lưu */
+  .popup-save_mc {
+    background: #28a745;
+    color: white;
+  }
+  
+  .popup-save_mc:hover {
+    background: #218838;
+  }
+  
+  /* Nút Xóa */
+  .popup-delete_mc {
+    background: #dc3545;
+    color: white;
+  }
+  
+  .popup-delete_mc:hover {
+    background: #c82333;
+  }
+  
+  /* Nút Hủy */
+  .popup-cancel_mc {
+    background: #6c757d;
+    color: white;
+  }
+  
+  .popup-cancel_mc:hover {
+    background: #5a6268;
+  }
+  
+  /* Hiệu ứng fade-in */
+  @keyframes fadeIn_mc {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  

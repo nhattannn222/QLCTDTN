@@ -1,6 +1,7 @@
 // render.js
 const baseUrl = document.body.getAttribute("data-base-url");
 import { editLink } from "./link_management.js";
+import { editMC } from "./minhchung.js";
 
 // Hàm renderPage
 export function renderPage(data, currentPage, itemsPerPage) {
@@ -38,6 +39,7 @@ export function renderPagination(data, currentPage, itemsPerPage) {
     currentPage--;
     renderPage(data, currentPage, itemsPerPage);
     attachEditSaveEvents();
+    attachEditMCSaveEvents();
   });
   pagination.appendChild(prevButton);
 
@@ -51,6 +53,7 @@ export function renderPagination(data, currentPage, itemsPerPage) {
 
       renderPage(data, currentPage, itemsPerPage);
       attachEditSaveEvents();
+      attachEditMCSaveEvents();
     });
     pagination.appendChild(pageButton);
   }
@@ -63,12 +66,17 @@ export function renderPagination(data, currentPage, itemsPerPage) {
     currentPage++;
     renderPage(data, currentPage, itemsPerPage);
     attachEditSaveEvents();
+    attachEditMCSaveEvents();
   });
   pagination.appendChild(nextButton);
 }
 
 // Hàm renderTables
 export function renderTables(data) {
+  const userRole = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("role="))
+    ?.split("=")[1];
   const container = document.querySelector("#tables-container");
   data.forEach((tieuChuan) => {
     const table = document.createElement("table");
@@ -87,7 +95,7 @@ export function renderTables(data) {
                 <th>Nơi ban hành hoặc nhóm, cá nhân thực hiện</th>
                 <th>Link</th>
                 <th>Sửa link</th>
-            `)
+                ${userRole === "admin" ? "<th>Sửa</th>" : ""}`)
       : (titleRow.innerHTML = `
                 <th>Tiêu chí</th>
                 <th>Số TT</th>
@@ -103,9 +111,10 @@ export function renderTables(data) {
     // Dòng hiển thị tiêu chuẩn (title)
     const headerRow = document.createElement("tr");
     const headerCell = document.createElement("td");
-    checkToken()
-      ? headerCell.setAttribute("colspan", "9")
-      : headerCell.setAttribute("colspan", "8");
+    headerCell.setAttribute(
+      "colspan",
+      checkToken() ? (userRole === "admin" ? "10" : "9") : "8"
+    );
     headerCell.textContent = tieuChuan.ten_tieu_chuan; // Hiển thị tiêu đề từ JSON
     headerCell.style.fontSize = "18px";
     headerCell.style.fontWeight = "bold";
@@ -130,7 +139,7 @@ export function renderTables(data) {
         tieuChiRow.appendChild(tieuChiCell);
 
         const moTaCell = document.createElement("td");
-        moTaCell.setAttribute("colspan", "8");
+        moTaCell.setAttribute("colspan", userRole === "admin" ? "9" : "8");
         moTaCell.textContent = tieuChi.mo_ta;
         moTaCell.style.textAlign = "left";
         moTaCell.style.fontSize = "16px";
@@ -156,80 +165,84 @@ export function renderTables(data) {
                   minhChungConRow.appendChild(sttCell);
                   minhChungConRow.appendChild(minhChungConCodeCell);
                 }
-                checkToken()
-                  ? (minhChungConRow.innerHTML += `
-                  <tr>
-                      <span class="ma_minh_chung_data" style="display: none;">${
-                        minhChung.ma_minh_chung
-                      }</span>
-                      <span class="folderUrl" style="display: none;">${
-                        minhChung.url
-                      }</span>
-                      <span class="ma_minh_chung_con" style="display: none;">${
-                        minhChungCon.ma_minh_chung_con
-                      }</span>
-                      <td class="so_minh_chung">${
-                        minhChungCon.so_minh_chung
-                      }</td>
-                      <td style="font-size: 12px; text-align: start;">${
-                        minhChungCon.ten_minh_chung
-                      }</td>
-                      <td style="width: 150px;">${
-                        minhChungCon.ngay_ban_hanh
-                      }</td>
-                      <td style="font-size: 12px;">${
-                        minhChungCon.noi_ban_hanh
-                      }</td>
-                      <td style="width: 170px; text-align: center;">
-                          <span class="link-text">
-                              ${
-                                minhChungCon.link
-                                  ? `<a href="${minhChungCon.link}" target="_blank" class="btn">
-                                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </a>`
-                                  : ""
-                              }
-                          </span>
-                          <input type="text" value="${
-                            minhChungCon.link || ""
-                          }" class="link" style="display: none;" />
-                      </td>
-                      <td>
-                          <button class="btn-edit" style="margin-left: 5px;">
-                              <i class="fa-solid fa-pen"></i> <!-- Biểu tượng bút -->
-                          </button>
-                          <button class="btn-save" style="margin-left: 5px; display: none;">
-                              <i class="fa-solid fa-save"></i> <!-- Biểu tượng lưu -->
-                          </button>
-                      </td>
-                  </tr>
-              `)
-                  : (minhChungConRow.innerHTML += `
-                                    <td>${minhChungCon.so_minh_chung}</td>
-                                    <td style="font-size: 12px; text-align: start;">${
-                                      minhChungCon.ten_minh_chung
-                                    }</td>
-                                    <td style="width: 150px;">${
-                                      minhChungCon.ngay_ban_hanh
-                                    }</td>
-                                    <td style="font-size: 12px;">${
-                                      minhChungCon.noi_ban_hanh
-                                    }</td>
-                                    <td style="width: 170px; text-align: center;">
-                                        <span class="link-text">
-                                            ${
-                                              minhChungCon.link
-                                                ? `<a href="${minhChungCon.link}" target="_blank" class="btn">
-                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                            </a>`
-                                                : ""
-                                            }
-                                        </span>
-                                        <input type="text" value="${
-                                          minhChungCon.link || ""
-                                        }" class="link" style="display: none;" />
-                                    </td>
-                                `);
+                let rowHTML = "";
+
+                if (checkToken()) {
+                  rowHTML = `
+    <tr>
+        <span class="ma_minh_chung_data" style="display: none;">${
+          minhChung.ma_minh_chung
+        }</span>
+        <span class="folderUrl" style="display: none;">${minhChung.url}</span>
+        <span class="ma_minh_chung_con" style="display: none;">${
+          minhChungCon.ma_minh_chung_con
+        }</span>
+        <td class="so_minh_chung">${minhChungCon.so_minh_chung}</td>
+        <td style="font-size: 12px; text-align: start;">${
+          minhChungCon.ten_minh_chung
+        }</td>
+        <td style="width: 150px;">${minhChungCon.ngay_ban_hanh}</td>
+        <td style="font-size: 12px;">${minhChungCon.noi_ban_hanh}</td>
+        <td style="width: 170px; text-align: center;">
+            <span class="link-text">
+                ${
+                  minhChungCon.link
+                    ? `<a href="${minhChungCon.link}" target="_blank" class="btn">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                      </a>`
+                    : ""
+                }
+            </span>
+            <input type="text" value="${
+              minhChungCon.link || ""
+            }" class="link" style="display: none;" />
+        </td>
+        <td>
+            <button class="btn-edit" style="margin-left: 5px;">
+                <i class="fa-solid fa-pen"></i> <!-- Biểu tượng bút -->
+            </button>
+        </td>
+  `;
+
+                  if (userRole === "admin") {
+                    rowHTML += `
+        <td>
+            <button class="btn-view" style="margin-left: 5px;">
+                <i class="fa-solid fa-eye"></i> <!-- Biểu tượng mắt -->
+            </button>
+        </td>
+    `;
+                  }
+
+                  rowHTML += `</tr>`;
+                } else {
+                  rowHTML = `
+    <tr>
+        <td>${minhChungCon.so_minh_chung}</td>
+        <td style="font-size: 12px; text-align: start;">${
+          minhChungCon.ten_minh_chung
+        }</td>
+        <td style="width: 150px;">${minhChungCon.ngay_ban_hanh}</td>
+        <td style="font-size: 12px;">${minhChungCon.noi_ban_hanh}</td>
+        <td style="width: 170px; text-align: center;">
+            <span class="link-text">
+                ${
+                  minhChungCon.link
+                    ? `<a href="${minhChungCon.link}" target="_blank" class="btn">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                      </a>`
+                    : ""
+                }
+            </span>
+            <input type="text" value="${
+              minhChungCon.link || ""
+            }" class="link" style="display: none;" />
+        </td>
+    </tr>
+  `;
+                }
+
+                minhChungConRow.innerHTML += rowHTML;
                 table.appendChild(minhChungConRow);
               });
             }
@@ -322,6 +335,15 @@ export function attachEditSaveEvents() {
   editButtons.forEach((button) => {
     button.addEventListener("click", function () {
       editLink(button); // Gọi hàm editLink
+    });
+  });
+}
+
+export function attachEditMCSaveEvents() {
+  const editMCButtons = document.querySelectorAll(".btn-view");
+  editMCButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      editMC(button); // Gọi hàm editLink
     });
   });
 }
@@ -422,4 +444,3 @@ function updateTableContent(table, data) {
     table.appendChild(newRow);
   });
 }
-
