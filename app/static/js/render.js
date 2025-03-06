@@ -263,7 +263,12 @@ export function renderNganh() {
         const container = document.getElementById("nganh-buttons-container");
 
         // Lấy ma_nganh từ URL hiện tại
-        const currentMaNganh = window.location.pathname.split(`${baseUrl}`)[1];
+        const pathSegments = window.location.pathname.split("/");
+        const lastSegment = pathSegments.filter(Boolean).pop(); // Lấy phần tử cuối không rỗng
+
+        const currentMaNganh = /^\d+$/.test(lastSegment) ? lastSegment : null; // Kiểm tra nếu là số
+
+        console.log(currentMaNganh); // Kết quả: "2" hoặc null nếu không phải số
 
         data.data.forEach((nganh) => {
           const button = document.createElement("button");
@@ -286,8 +291,13 @@ export function renderNganh() {
             button.style.backgroundColor = "#ad171c"; // Màu nền
             button.style.color = "white"; // Màu chữ
 
-            // Điều hướng đến ma_nganh
-            window.location.href = `${baseUrl}${nganh.ma_nganh}`;
+            // Điều hướng đến ma_nganhconst currentPath = window.location.pathname;
+            const currentPath = window.location.pathname;
+            const newPath = currentPath.includes("/mcbs/")
+              ? `${baseUrl}mcbs/${nganh.ma_nganh}`
+              : `${baseUrl}${nganh.ma_nganh}`;
+
+            window.location.href = newPath;
           };
           container.appendChild(button);
         });

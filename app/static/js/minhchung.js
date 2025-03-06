@@ -6,7 +6,6 @@ if (baseUrl !== "/qldt/") {
 import { showMessage } from "./floating_message.js";
 
 function showPopup(saveCallback, minhChungData) {
-
   document.getElementById("popup-container_mc")?.remove();
 
   const popupContainer = document.createElement("div");
@@ -86,9 +85,21 @@ function hidePopup() {
 
 async function deleteMinhChung(maMinhChungCon) {
   try {
-    const response = await fetch(`${baseUrl}/api/v1/minh_chung_con/${maMinhChungCon}`, {
-      method: "POST",
-    });
+    const token = getCookie("token");
+    if (!token) {
+      showMessage("Bạn chưa đăng nhập hoặc token không hợp lệ.", "error");
+      return;
+    }
+    const response = await fetch(
+      `${baseUrl}/api/v1/minh_chung_con/${maMinhChungCon}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       showMessage("Lỗi khi xóa minh chứng!", "error");
@@ -102,7 +113,6 @@ async function deleteMinhChung(maMinhChungCon) {
 }
 
 export async function editMC(button) {
-  
   const row = button.closest("tr");
   const maMinhChungCon = row
     .querySelector(".ma_minh_chung_con")
@@ -114,7 +124,9 @@ export async function editMC(button) {
   }
 
   try {
-    const response = await fetch(`${baseUrl}/api/v1/minh_chung_con/${maMinhChungCon}`);
+    const response = await fetch(
+      `${baseUrl}/api/v1/minh_chung_con/${maMinhChungCon}`
+    );
     const result = await response.json();
 
     if (!response.ok) {
@@ -135,28 +147,29 @@ export async function editMC(button) {
 }
 
 async function updateMinhChung(data, updatedData) {
-
-    const token = getCookie("token");
+  const token = getCookie("token");
   if (!token) {
     showMessage("Bạn chưa đăng nhập hoặc token không hợp lệ.", "error");
     return;
   }
   try {
-    
     // Kiểm tra nếu không có `so_minh_chung`, đặt mặc định là chuỗi rỗng
     if (!data.ma_minh_chung_con) {
-        showMessage("Mã minh chứng con không hợp lệ!", "error");
-        return;
+      showMessage("Mã minh chứng con không hợp lệ!", "error");
+      return;
     }
 
-    const response = await fetch(`${baseUrl}/api/v1/minh_chung_con/${data.ma_minh_chung_con}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(
+      `${baseUrl}/api/v1/minh_chung_con/${data.ma_minh_chung_con}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      }
+    );
 
     const result = await response.json();
 
@@ -165,9 +178,9 @@ async function updateMinhChung(data, updatedData) {
     }
 
     showMessage("Cập nhật thành công!", "success");
-    setTimeout(()=>{
-        location.reload()
-    })
+    setTimeout(() => {
+      location.reload();
+    });
     hidePopup();
   } catch (error) {
     console.error("Lỗi khi cập nhật minh chứng:", error);
@@ -177,9 +190,8 @@ async function updateMinhChung(data, updatedData) {
 
 // Hàm lấy giá trị của cookie theo tên
 function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-    return null;
-  }
-  
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}

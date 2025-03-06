@@ -121,3 +121,55 @@ def updateURLbctdg(ma_bc_tdg, data):
     except Exception as e:
         # Xử lý lỗi và trả về thông báo lỗi
         return {"error": str(e)}, 500
+
+
+def fetch_minh_chung_bo_sung(ma_nganh=None):
+    # Truy vấn dữ liệu từ database với các mối quan hệ
+    query = TieuChuan.query.options(
+        joinedload(TieuChuan.tieu_chis).joinedload(TieuChi.minh_chungs).joinedload(MinhChung.minh_chung_cons)
+    )
+
+    # Nếu có mã ngành, thêm điều kiện lọc theo mã ngành
+    if ma_nganh is not None and ma_nganh != 0:
+        query = query.filter_by(ma_nganh=ma_nganh)
+
+    tieu_chuans = query.all()
+
+    # Hàm loại bỏ các chuỗi [2], [3], [4], [5]
+    def remove_brackets(value):
+        if isinstance(value, str):
+            return re.sub(r'\[\d\]', '', value)
+        return value
+
+    # Biểu thức regex để kiểm tra "[BSXY]" (XY là hai ký tự bất kỳ)
+    pattern = re.compile(r"\[BS\w{2}\]$")
+
+    # Chuyển dữ liệu sang format yêu cầu
+    data = []
+    for tieu_chuan in tieu_chuans:
+        tieu_chi_list = []
+        for tieu_chi in tieu_chuan.tieu_chis:
+            minh_chung_list = []
+            for minh_chung in tieu_chi.minh_chungs:
+                if pattern.search(minh_chung.ma_minh_chung):  # Sử dụng regex thay vì endswith()
+                    minh_chung_cons = [mc.to_dict() for mc in minh_chung.minh_chung_cons]
+                    minh_chung_list.append({
+                        "so_thu_tu": minh_chung.so_thu_tu,
+                        "ma_minh_chung": remove_brackets(minh_chung.ma_minh_chung),
+                        "url": minh_chung.url,
+                        "minh_chung_cons": minh_chung_cons
+                    })
+            if minh_chung_list:  # Chỉ thêm tiêu chí nếu có minh chứng
+                tieu_chi_list.append({
+                    "ma_tieu_chi": remove_brackets(tieu_chi.ma_tieu_chi),
+                    "mo_ta": tieu_chi.mo_ta,
+                    "minh_chungs": minh_chung_list
+                })
+        if tieu_chi_list:  # Chỉ thêm tiêu chuẩn nếu có tiêu chí
+            data.append({
+                "ma_tieu_chuan": remove_brackets(tieu_chuan.ma_tieu_chuan),
+                "ten_tieu_chuan": tieu_chuan.ten_tieu_chuan,
+                "tieu_chis": tieu_chi_list
+            })
+    
+    return data
