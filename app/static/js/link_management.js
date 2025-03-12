@@ -185,6 +185,12 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
     let folderPathList = Object.keys(folderMap);
     folderPathList.sort((a, b) => a.split("/").length - b.split("/").length);
 
+    const token = getCookie("token");
+          if (!token) {
+            showMessage("Bạn chưa đăng nhập hoặc token không hợp lệ.", "error");
+            return;
+          }
+
     for (const folderPath of folderPathList) {
       if (!folderPath.trim()) continue;
 
@@ -200,7 +206,9 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
         if (!folderMap[currentPath]) {
           const response = await fetch(`${baseUrl}api/v1/create_folder`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: 
+            { "Content-Type": "application/json",
+              Authorization: `Bearer ${token}` },
             body: JSON.stringify({
               parent_folder_id: parentFolderId,
               folder_name: folderName.trim(),
