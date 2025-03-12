@@ -253,7 +253,9 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
       return fetch(`${baseUrl}api/v1/upload_file?folder_id=${parentFolderId}`, {
         method: "POST",
         body: formData,
-        Authorization: `Bearer ${token}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
       })
         .then((response) => response.json())
         .then((data) => {
