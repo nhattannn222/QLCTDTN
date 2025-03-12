@@ -21,10 +21,9 @@ def fetch_tieu_chuan_data(ma_nganh=None):
 
     # Hàm loại bỏ các chuỗi [2], [3], [4], [5]
     def remove_brackets(value):
-        # Đảm bảo value là chuỗi trước khi áp dụng re.sub
         if isinstance(value, str):
             return re.sub(r'\[\d\]', '', value)
-        return value  # Trả về giá trị gốc nếu không phải chuỗi
+        return value
 
     # Chuyển dữ liệu sang format dễ render trong template
     data = []
@@ -33,25 +32,34 @@ def fetch_tieu_chuan_data(ma_nganh=None):
         for tieu_chi in tieu_chuan.tieu_chis:
             minh_chung_list = []
             for minh_chung in tieu_chi.minh_chungs:
-                minh_chung_cons = [mc.to_dict() for mc in minh_chung.minh_chung_cons]
+                # Lọc bỏ những minh_chung_con có chứa 'BS' trong tên minh chứng
+                minh_chung_cons = [
+                    mc.to_dict()
+                    for mc in minh_chung.minh_chung_cons
+                    if "BS" not in mc.ma_minh_chung
+                ]
+
                 minh_chung_list.append({
                     "so_thu_tu": minh_chung.so_thu_tu,
-                    "ma_minh_chung": remove_brackets(minh_chung.ma_minh_chung),  # Loại bỏ [2], [3], [4], [5]
+                    "ma_minh_chung": remove_brackets(minh_chung.ma_minh_chung),
                     "url": minh_chung.url,
                     "minh_chung_cons": minh_chung_cons
                 })
+
             tieu_chi_list.append({
-                "ma_tieu_chi": remove_brackets(tieu_chi.ma_tieu_chi),  # Loại bỏ [2], [3], [4], [5]
+                "ma_tieu_chi": remove_brackets(tieu_chi.ma_tieu_chi),
                 "mo_ta": tieu_chi.mo_ta,
                 "minh_chungs": minh_chung_list
             })
+
         data.append({
-            "ma_tieu_chuan": remove_brackets(tieu_chuan.ma_tieu_chuan),  # Loại bỏ [2], [3], [4], [5]
+            "ma_tieu_chuan": remove_brackets(tieu_chuan.ma_tieu_chuan),
             "ten_tieu_chuan": tieu_chuan.ten_tieu_chuan,
             "tieu_chis": tieu_chi_list
         })
 
     return data
+
 
 def getMaNganh(token):
     nguoi_dung = None  # Khởi tạo nguoi_dung mặc định là None
@@ -122,7 +130,6 @@ def updateURLbctdg(ma_bc_tdg, data):
         # Xử lý lỗi và trả về thông báo lỗi
         return {"error": str(e)}, 500
 
-
 def fetch_minh_chung_bo_sung(ma_nganh=None):
     # Truy vấn dữ liệu từ database với các mối quan hệ
     query = TieuChuan.query.options(
@@ -135,12 +142,12 @@ def fetch_minh_chung_bo_sung(ma_nganh=None):
 
     tieu_chuans = query.all()
 
-    # Hàm loại bỏ [1] hoặc [2] ở đầu và xóa tất cả [ ] còn lại
-    def clean_ma_minh_chung(value):
+    # Hàm làm sạch mã (áp dụng cho ma_tieu_chi và ma_minh_chung)
+    def clean_ma(value):
         if isinstance(value, str):
-            # Bỏ prefix dạng [1], [2], [3] ở đầu chuỗi
+            # Loại bỏ đoạn đầu kiểu [1], [2], ...
             value = re.sub(r'^\[\d+\]', '', value)
-            # Xóa tất cả dấu [ và ]
+            # Xóa toàn bộ dấu [ và ]
             value = value.replace('[', '').replace(']', '')
             return value.strip()
         return value
@@ -152,8 +159,8 @@ def fetch_minh_chung_bo_sung(ma_nganh=None):
         for tieu_chi in tieu_chuan.tieu_chis:
             minh_chung_list = []
             for minh_chung in tieu_chi.minh_chungs:
-                # Làm sạch mã minh chứng
-                cleaned_ma_minh_chung = clean_ma_minh_chung(minh_chung.ma_minh_chung)
+                # Làm sạch ma_minh_chung
+                cleaned_ma_minh_chung = clean_ma(minh_chung.ma_minh_chung)
 
                 # Kiểm tra mã có chứa chữ "BS" không
                 if 'BS' in cleaned_ma_minh_chung:
@@ -167,14 +174,14 @@ def fetch_minh_chung_bo_sung(ma_nganh=None):
 
             if minh_chung_list:
                 tieu_chi_list.append({
-                    "ma_tieu_chi": tieu_chi.ma_tieu_chi,
+                    "ma_tieu_chi": clean_ma(tieu_chi.ma_tieu_chi),  # Làm sạch ma_tieu_chi ở đây
                     "mo_ta": tieu_chi.mo_ta,
                     "minh_chungs": minh_chung_list
                 })
 
         if tieu_chi_list:
             data.append({
-                "ma_tieu_chuan": tieu_chuan.ma_tieu_chuan,
+                "ma_tieu_chuan": tieu_chuan.ma_tieu_chuan,  # Không làm sạch
                 "ten_tieu_chuan": tieu_chuan.ten_tieu_chuan,
                 "tieu_chis": tieu_chi_list
             })
