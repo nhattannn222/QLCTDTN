@@ -244,9 +244,16 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
       const formData = new FormData();
       formData.append("file", file);
 
+      const token = getCookie("token");
+          if (!token) {
+            showMessage("Bạn chưa đăng nhập hoặc token không hợp lệ.", "error");
+            return;
+          }
+
       return fetch(`${baseUrl}api/v1/upload_file?folder_id=${parentFolderId}`, {
         method: "POST",
         body: formData,
+        Authorization: `Bearer ${token}`,
       })
         .then((response) => response.json())
         .then((data) => {
