@@ -1,12 +1,16 @@
 from sqlalchemy.orm import joinedload
-from app.models import TieuChuan
-from app.models import TieuChi
-from app.models import MinhChung
-from app.models import NguoiDung
-from app.models import BCTDG, db
+from app.models import TieuChuan, Nganh, TieuChi, MinhChung, NguoiDung, BCTDG, db
 import re
 
 def fetch_tieu_chuan_data(ma_nganh=None):
+    # Kiểm tra tính hợp lệ của ma_nganh trong bảng Nganh
+    if ma_nganh is not None and ma_nganh != 0:
+        # Kiểm tra xem ma_nganh có tồn tại trong bảng Nganh không
+        valid_nganh = Nganh.query.filter_by(ma_nganh=ma_nganh).first()  # Truy vấn bảng Nganh
+        if not valid_nganh:
+            print(f"Invalid ma_nganh: {ma_nganh}, returning empty data.")
+            return []  # Nếu không tồn tại, trả về dữ liệu rỗng thay vì ném lỗi
+
     # Truy vấn dữ liệu từ database với các mối quan hệ
     query = TieuChuan.query.options(
         joinedload(TieuChuan.tieu_chis).joinedload(TieuChi.minh_chungs).joinedload(MinhChung.minh_chung_cons)
@@ -22,7 +26,7 @@ def fetch_tieu_chuan_data(ma_nganh=None):
     # Hàm loại bỏ các chuỗi [2], [3], [4], [5]
     def remove_brackets(value):
         if isinstance(value, str):
-            return re.sub(r'\[\d\]', '', value)
+            return re.sub(r'\[\d+\]', '', value)  # Loại bỏ [số bất kỳ]
         return value
 
     # Chuyển dữ liệu sang format dễ render trong template
@@ -59,7 +63,6 @@ def fetch_tieu_chuan_data(ma_nganh=None):
         })
 
     return data
-
 
 def getMaNganh(token):
     nguoi_dung = None  # Khởi tạo nguoi_dung mặc định là None

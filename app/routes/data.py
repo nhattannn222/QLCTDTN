@@ -3,7 +3,7 @@ import os
 import logging
 from flask import Blueprint, jsonify, request
 from app.services.nganh import getNganh
-from app.services.minh_chung_con import update_link, updateMC, getMC, deleteMC, create_minh_chung_con
+from app.services.minh_chung_con import update_link, updateMC, getMC, deleteMC, create_minh_chung_con_bs, create_minh_chung_con
 from app.services.data_service import get_bctdg, updateURLbctdg
 from app.middlewares.authorize import authorize
 from googleapiclient.http import MediaIoBaseUpload
@@ -264,12 +264,41 @@ def create_minh_chung_con_route():
     try:
         data = request.json
         ma_minh_chung = data.get("ma_minh_chung")
+        ten_minh_chung = data.get("ten_minh_chung")
+        so_minh_chung = data.get("so_minh_chung")
+        noi_ban_hanh = data.get("noi_ban_hanh")
+        ngay_ban_hanh = data.get("ngay_ban_hanh")
+
+        # Kiểm tra thông tin bắt buộc
+        if not ma_minh_chung or not ten_minh_chung or not so_minh_chung or not noi_ban_hanh or not ngay_ban_hanh:
+            return jsonify({"message": "Thiếu thông tin bắt buộc!"}), 400
+
+        # Gọi service xử lý
+        response = create_minh_chung_con(
+            ma_minh_chung,
+            ten_minh_chung, 
+            so_minh_chung, 
+            noi_ban_hanh, 
+            ngay_ban_hanh
+        )
+        
+
+        return jsonify({'status': 200, 'message': 'Lấy thông tin thành công', 'data': response}), 200
+    except Exception as e:
+        return jsonify({"message": "Lỗi hệ thống!", "error": str(e)}), 500
+
+@data_bp.route('/api/v1/minh_chung_con_bs', methods=['POST'])
+@authorize
+def create_minh_chung_con_bs_route():
+    try:
+        data = request.json
+        ma_minh_chung = data.get("ma_minh_chung")
         so_thu_tu = data.get("so_thu_tu")
         ma_tieu_chi = data.get("ma_tieu_chi")
         ten_minh_chung = data.get("ten_minh_chung")
         so_minh_chung = data.get("so_minh_chung")
         noi_ban_hanh = data.get("noi_ban_hanh")
-        url = data.get("url")  # Trùng với key trong form
+        url = data.get("url")
         ngay_ban_hanh = data.get("ngay_ban_hanh")
 
         # Kiểm tra thông tin bắt buộc
@@ -277,7 +306,7 @@ def create_minh_chung_con_route():
             return jsonify({"message": "Thiếu thông tin bắt buộc!"}), 400
 
         # Gọi service xử lý
-        response = create_minh_chung_con(
+        response = create_minh_chung_con_bs(
             ma_minh_chung,
             so_thu_tu, 
             ma_tieu_chi, 
@@ -290,7 +319,6 @@ def create_minh_chung_con_route():
         
 
         return jsonify({'status': 200, 'message': 'Lấy thông tin thành công', 'data': response}), 200
-
     except Exception as e:
         return jsonify({"message": "Lỗi hệ thống!", "error": str(e)}), 500
     
@@ -341,3 +369,5 @@ def delete_minh_chung_con(ma_minh_chung_con):
             return jsonify({'status': 404, 'message': 'Không tìm thấy minh chứng'}), 404
     except Exception as e:
         return jsonify({'status': 500, 'message': f'Lỗi server: {str(e)}'}), 500
+    
+    

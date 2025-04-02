@@ -14,3 +14,11 @@ class MinhChung(db.Model):
 
     def __repr__(self):
         return f"<MinhChung {self.ma_minh_chung}>"
+    
+    def to_dict(self):
+        return {
+            "ma_minh_chung": self.ma_minh_chung,
+            "so_thu_tu": self.so_thu_tu,
+            "ma_tieu_chi": self.ma_tieu_chi,
+            "url": self.url
+        }

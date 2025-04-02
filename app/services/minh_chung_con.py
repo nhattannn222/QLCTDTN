@@ -71,8 +71,29 @@ def deleteMC(ma_minh_chung_con):
     except Exception as e:
         db.session.rollback()
         raise e  # Ném lỗi để xử lý phía trên
+    
+def create_minh_chung_con(ma_minh_chung, ten_minh_chung, so_minh_chung="", noi_ban_hanh="", ngay_ban_hanh=""):
+    try:            
+        # Tạo MinhChungCon với thông tin đầy đủ
+        new_minh_chung_con = MinhChungCon(
+            ma_minh_chung=ma_minh_chung,
+            ten_minh_chung=ten_minh_chung,
+            so_minh_chung=so_minh_chung,
+            noi_ban_hanh=noi_ban_hanh,
+            ngay_ban_hanh=ngay_ban_hanh,
+            link=""
+        )
 
-def create_minh_chung_con(ma_minh_chung, so_thu_tu, ma_tieu_chi, ten_minh_chung, url="", so_minh_chung="", noi_ban_hanh="", ngay_ban_hanh=""):
+        db.session.add(new_minh_chung_con)
+        db.session.commit()
+
+        return new_minh_chung_con.to_dict()
+
+    except Exception as e:
+        db.session.rollback()
+        return str(e)
+    
+def create_minh_chung_con_bs(ma_minh_chung, so_thu_tu, ma_tieu_chi, ten_minh_chung, url="", so_minh_chung="", noi_ban_hanh="", ngay_ban_hanh=""):
     try:
         if not so_thu_tu or not ma_tieu_chi or not ten_minh_chung:
             abort(400, description="Thiếu thông tin bắt buộc!") 

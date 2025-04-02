@@ -1,5 +1,5 @@
 # app/routes/main.py
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from app.services.data_service import fetch_tieu_chuan_data, getMaNganh, get_bctdg, fetch_minh_chung_bo_sung
 from config import Config
 main_bp = Blueprint('main', __name__)
@@ -19,11 +19,9 @@ def index(index):
         data = fetch_tieu_chuan_data(index)
     return render_template('index.html', data=data, base_url=Config.BASE_URL)
 
-
 @main_bp.route('/login')
 def login():
     return render_template('login.html', base_url=Config.BASE_URL)
-
 
 @main_bp.route('/bctdg')
 def bctdg():
@@ -38,7 +36,6 @@ def bctdg():
     else:
         data = get_bctdg()
     return render_template('bctdg.html',data=data, base_url=Config.BASE_URL)
-
 
 @main_bp.route('/', defaults={'index': 1})
 @main_bp.route('/mcbs/<index>')

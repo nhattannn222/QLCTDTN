@@ -154,7 +154,7 @@
   /* Tiêu đề popup */
   .popup-content_mc h3 {
     margin-top: 0;
-    font-size: 18px;
+    font-size: 24px;
     text-align: center;
   }
   
@@ -171,14 +171,6 @@
     font-size: 14px;
   }
   
-  /* Input & Textarea */
-  .popup-input_mc {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-  }
   
   /* Textarea có thể thay đổi chiều cao */
   .popup-input_mc[type="text"],
@@ -189,8 +181,8 @@
 
   .popup-input_mc {
     width: 100%; /* Đảm bảo full width */
-    min-height: 100px; /* Chiều cao tối thiểu */
-    max-height: 300px; /* Giới hạn chiều cao tối đa */
+    min-height: 60px; /* Chiều cao tối thiểu */
+    max-height: 100px; /* Giới hạn chiều cao tối đa */
     overflow-y: hidden; /* Ẩn thanh cuộn dọc */
     resize: none; /* Không cho phép kéo thủ công */
 

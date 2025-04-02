@@ -13,3 +13,10 @@ class TieuChuan(db.Model):
 
     def __repr__(self):
         return f"<TieuChuan {self.ten_tieu_chuan}>"
+
+    def to_dict(self):
+        return {
+            "ma_tieu_chuan": self.ma_tieu_chuan,
+            "ten_tieu_chuan": self.ten_tieu_chuan,
+            "ma_nganh": self.ma_nganh
+        }

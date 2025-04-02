@@ -268,11 +268,9 @@ export function renderNganh() {
 
         const currentMaNganh = /^\d+$/.test(lastSegment) ? lastSegment : null; // Kiểm tra nếu là số
 
-        console.log(currentMaNganh); // Kết quả: "2" hoặc null nếu không phải số
-
         data.data.forEach((nganh) => {
           const button = document.createElement("button");
-          button.textContent = `Ngành ${nganh.ten_nganh}`;
+          button.textContent = `${nganh.ten_nganh}`;
           if (nganh.ma_nganh == currentMaNganh) {
             button.style.backgroundColor = "#ad171c"; // Màu nền
             button.style.color = "white"; // Màu chữ
