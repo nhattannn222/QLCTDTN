@@ -95,7 +95,7 @@ export function renderTables(data) {
                 <th>Nơi ban hành hoặc nhóm, cá nhân thực hiện</th>
                 <th>Link</th>
                 <th>Sửa link</th>
-                ${userRole === "admin" ? "<th>Sửa</th>" : ""}`)
+                ${userRole === "admin" ||userRole==="manager"? "<th>Sửa</th>" : ""}`)
       : (titleRow.innerHTML = `
                 <th>Tiêu chí</th>
                 <th>Số TT</th>
@@ -113,7 +113,7 @@ export function renderTables(data) {
     const headerCell = document.createElement("td");
     headerCell.setAttribute(
       "colspan",
-      checkToken() ? (userRole === "admin" ? "10" : "9") : "8"
+      checkToken() ? (userRole === "admin" || userRole === "manager" ? "10" : "9") : "8"
     );
     headerCell.textContent = tieuChuan.ten_tieu_chuan; // Hiển thị tiêu đề từ JSON
     headerCell.style.fontSize = "18px";
@@ -139,7 +139,7 @@ export function renderTables(data) {
         tieuChiRow.appendChild(tieuChiCell);
 
         const moTaCell = document.createElement("td");
-        moTaCell.setAttribute("colspan", userRole === "admin" ? "9" : "8");
+        moTaCell.setAttribute("colspan", userRole === "admin" || userRole === "manager" ? "9" : "8");
         moTaCell.textContent = tieuChi.mo_ta;
         moTaCell.style.textAlign = "left";
         moTaCell.style.fontSize = "16px";
@@ -204,7 +204,7 @@ export function renderTables(data) {
         </td>
   `;
 
-                  if (userRole === "admin") {
+                  if (userRole === "admin" || userRole === "manager") {
                     rowHTML += `
         <td>
             <button class="btn-view" style="margin-left: 5px;">

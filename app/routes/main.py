@@ -1,7 +1,10 @@
 # app/routes/main.py
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory
 from app.services.data_service import fetch_tieu_chuan_data, getMaNganh, get_bctdg, fetch_minh_chung_bo_sung
 from config import Config
+import os
+
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', 'uploads', 'img')
 main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/', defaults={'index': 1})
@@ -51,3 +54,8 @@ def mcbs(index):
     else:
         data = fetch_minh_chung_bo_sung(index)
     return render_template('mcbs.html', data=data, base_url=Config.BASE_URL)
+
+# Cấu hình Flask để phục vụ ảnh từ thư mục uploads/img
+@main_bp.route('/uploads/img/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
