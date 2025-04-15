@@ -370,7 +370,7 @@ async function showRequestPopup() {
                 <td>${request.noi_dung}</td>
                 <td>${new Date(request.ngay_yeu_cau).toLocaleString()}</td>
                 <td>${request.ngay_xu_li ? new Date(request.ngay_xu_li).toLocaleString() : "Chưa xử lý"}</td>
-                <td style="width: 120px;">${request.trang_thai}</td> <!-- Thêm width cho cột Trạng thái -->
+                <td style="width: 120px;">${request.trang_thai=="chua_xu_li"?"Chưa xử lí":"Đã xử lí"}</td> <!-- Thêm width cho cột Trạng thái -->
                 <td>
                   <img src="${request.duong_dan_den_anh_yeu_cau}" 
                        alt="Ảnh yêu cầu" 
