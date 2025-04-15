@@ -21,22 +21,24 @@ function showPopup(saveCallback, maMinhChung, maFolder, currentLink = "") {
   // Nội dung của popup
   popupContainer.innerHTML = `
     <div class="popup-content">
-      <h3>Chỉnh sửa link</h3>
+      <button class="popup-close-circle" id="popup-cancel" ">×</button>
+      <h3>
+        Chỉnh sửa link
+      </h3>
       <div id="no-links-message" style="display: none; color: red; font-size: 16px; margin-bottom: 10px;">
         Không có liên kết nào để chọn.
       </div>
       <div id="popup-link-list" class="popup-link-list"></div>
       <div class="file-upload-section" style="margin-top: 15px;">
-        <label for="file-upload" style="display: block; margin-bottom: 5px;">Tải tệp lên:</label>
-        <input type="file" id="file-upload" multiple style="margin-bottom: 10px;" />
-        <label for="folder-upload" style="display: block; margin-bottom: 5px;">Tải thư mục lên:</label>
-        <input type="file" id="folder-upload" webkitdirectory multiple style="margin-bottom: 10px;" />
-        <button id="upload-button" class="popup-upload">Tải lên</button>
+        <label for="file-upload" style="display: block; margin-bottom: 5px; font-weight:bold;">Tải tệp lên:</label>
+        <input type="file" id="file-upload" multiple style="margin-bottom: 15px;" />
+        <label for="folder-upload" style="display: block; margin-bottom: 5px; font-weight:bold;">Tải thư mục lên:</label>
+        <input type="file" id="folder-upload" webkitdirectory multiple style="margin-bottom: 15px;" />
+        <button id="upload-button" class="popup-upload_mc">Tải lên Drive</button>
       </div>
       <div class="popup-buttons">
         <button id="popup-save" class="popup-save">Lưu</button>
         <button id="popup-delete" class="popup-delete">Xóa</button>
-        <button id="popup-cancel" class="popup-cancel">Hủy</button>
       </div>
     </div>
   `;

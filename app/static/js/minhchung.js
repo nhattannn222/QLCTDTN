@@ -15,6 +15,7 @@ function showPopup(saveCallback, minhChungData) {
 
   popupContainer.innerHTML = `
     <div class="popup-content_mc">
+      <button class="popup-close-circle" id="popup-cancel_mc" ">×</button>
       <h3>Chỉnh sửa minh chứng</h3>
       <div class="popup-form_mc">
         <label for="soMinhChungCon_mc">Số minh chứng:</label>
@@ -39,9 +40,8 @@ function showPopup(saveCallback, minhChungData) {
       </div>
 
       <div class="popup-buttons_mc">
-        <button id="popup-save_mc" class="popup-save_mc">Lưu</button>
-        <button id="popup-delete_mc" class="popup-delete_mc">Xóa</button>
-        <button id="popup-cancel_mc" class="popup-cancel_mc">Hủy</button>
+        <button id="popup-save_mc" class="popup-save_mc">Lưu MC</button>
+        <button id="popup-delete_mc" class="popup-delete_mc">Xóa MC</button>
       </div>
     </div>
   `;

@@ -36,7 +36,10 @@ async function showCreatePopup(saveCallback) {
 
   popupContainer.innerHTML = `
     <div class="popup-content_mc" style="padding: 8px; width: 520px; display: flex; flex-direction: column; max-width: 100%;">
-      <h3>Tạo mới minh chứng</h3>
+    <button class="popup-close-circle" id="popup-cancel_mc" ">×</button>  
+    <h3 style="font-size: 22px; margin-bottom: 16px;">
+        Tạo mới minh chứng
+      </h3>
       <div class="popup-form_mc" style="display: flex; flex-direction: column; gap: 10px;">
         <label for="tieuChuan_mc">Tiêu chuẩn:</label>
         <select id="tieuChuan_mc" class="popup-input_mc" style="height: 40px;"></select>
@@ -68,7 +71,6 @@ async function showCreatePopup(saveCallback) {
 
         <div class="popup-buttons_mc" style="display: flex; gap: 10px; justify-content: center;">
           <button id="popup-save_mc" class="popup-save_mc">Lưu</button>
-          <button id="popup-cancel_mc" class="popup-cancel_mc">Hủy</button>
         </div>
       </div>
     </div>
@@ -260,7 +262,7 @@ if (token && role) {
   if (role === "manager") {
     const floatingButton3 = document.createElement("button");
     floatingButton3.id = "floating-create-request";
-    floatingButton3.textContent = "✍️";
+    floatingButton3.textContent = "📝";
     floatingButton3.className = "floating-button_mc";
     floatingButton3.onclick = () => {
       showCreateRequestPopup(); // Nút tạo yêu cầu cho Manager
@@ -286,7 +288,7 @@ if (token && role) {
     .floating-button_mc {
       width: 50px;
       height: 50px;
-      background-color: #007bff;
+      background-color: #ad171c;
       color: white;
       border: none;
       border-radius: 50%;
@@ -297,7 +299,7 @@ if (token && role) {
     }
 
     .floating-button_mc:hover {
-      background-color: #0056b3;
+      background-color: #760508;
     }
 
     #floating-create-mc {
@@ -340,8 +342,11 @@ async function showRequestPopup() {
     const requestList = await response.json();
 
     popupContainer.innerHTML = `
-    <div class="popup-content_mc" style="padding: 16px; width: 1200px; display: flex; flex-direction: column; max-width: 100%; font-size: 16px;">
-      <h3 style="font-size: 22px;">Danh sách yêu cầu</h3>
+    <div class="popup-content_mc" style="padding: 16px; width: 1200px; display: flex; flex-direction: column; align-items: center;   max-width: 100%; font-size: 16px;">
+      <button class="popup-close-circle" id="popup-close_requests" ">×</button>
+      <h3 style="font-size: 22px; margin-bottom: 16px; ">
+        Danh sách yêu cầu
+      </h3>
       <table style="width: 100%; border-collapse: collapse; font-size: 16px;">
         <thead>
           <tr>
@@ -380,7 +385,7 @@ async function showRequestPopup() {
                     : request.trang_thai === "chua_xu_li" && role === "admin"
                     ? ` 
                         <input type="file" id="upload_${request.ma_yeu_cau}" accept="image/*" style="display: none;">
-                        <button class="upload-btn" data-id="${request.ma_yeu_cau}">Upload ảnh</button>
+                        <button class="popup-upload_mc" data-id="${request.ma_yeu_cau}">Tải ảnh</button>
                         <span id="file_name_${request.ma_yeu_cau}" style="margin-left: 8px;"></span>
                       ` : "Chưa xử lý"
                   }
@@ -392,7 +397,7 @@ async function showRequestPopup() {
                 ${role !== "manager" ? `
                   <td>
                     ${role === "admin" && request.trang_thai === "chua_xu_li"
-                      ? `<button class="save-btn" data-id="${request.ma_yeu_cau}">Lưu</button>`
+                      ? `<button class="popup-save_mc" data-id="${request.ma_yeu_cau}">Cập nhật</button>`
                       : ""
                     }
                   </td>` : ""}
@@ -401,7 +406,6 @@ async function showRequestPopup() {
           }
         </tbody>
       </table>
-      <button id="popup-close_requests" class="popup-close_mc" style="margin-top: 10px; padding: 8px 16px; font-size: 16px;">Đóng</button>
     </div>
   `;
 
@@ -409,7 +413,7 @@ async function showRequestPopup() {
     document.getElementById("popup-close_requests").onclick = hideRequestPopup;
 
     // Gán sự kiện cho tất cả nút upload
-    document.querySelectorAll(".upload-btn").forEach((btn) => {
+    document.querySelectorAll(".popup-upload_mc").forEach((btn) => {
       btn.addEventListener("click", function () {
         const id = this.getAttribute("data-id");
         document.getElementById(`upload_${id}`).click();
@@ -426,7 +430,7 @@ async function showRequestPopup() {
     });
 
     // Gán sự kiện cho tất cả nút lưu
-    document.querySelectorAll(".save-btn").forEach((btn) => {
+    document.querySelectorAll(".popup-save_mc").forEach((btn) => {
       btn.addEventListener("click", function () {
         const id = this.getAttribute("data-id");
         handleUpload(id);
@@ -436,7 +440,9 @@ async function showRequestPopup() {
     console.error("Error fetching data:", error);
     popupContainer.innerHTML = `
       <div class="popup-content_mc" style="padding: 16px; width: 900px; display: flex; flex-direction: column; max-width: 100%; font-size: 16px;">
-        <h3 style="font-size: 22px;">Danh sách yêu cầu</h3>
+        <h3 style="font-size: 22px; margin-bottom: 16px; font-weight: bold;">
+          Danh sách yêu cầu
+        </h3>
         <p style="color: red;">Không thể lấy dữ liệu yêu cầu. Vui lòng thử lại sau.</p>
         <button id="popup-close_requests" class="popup-close_mc" style="margin-top: 10px; padding: 8px 16px; font-size: 16px;">Đóng</button>
       </div>
@@ -499,17 +505,19 @@ function showCreateRequestPopup() {
 
   popupContainer.innerHTML = `
     <div class="popup-content_mc" style="padding: 16px; width: 500px; display: flex; flex-direction: column; max-width: 100%; font-size: 16px;">
-      <h3 style="font-size: 22px;">Tạo yêu cầu mới</h3>
+    <button class="popup-close-circle" id="popup-close-create-request" ">×</button>      
+    <h3 style="font-size: 22px; ">Tạo yêu cầu mới</h3>
       <form id="create-request-form" enctype="multipart/form-data">
         <label for="request-content">Nội dung yêu cầu:</label>
-        <textarea id="request-content" name="request-content" required style="width: 100%; height: 100px;"></textarea>
+        <textarea id="request-content" name="request-content" required></textarea>
 
-        <label for="request-file" style="margin-top: 10px;">Tải lên file:</label>
-        <input type="file" id="request-file" name="request-file" accept="image/*,application/pdf" style="margin-top: 10px;"/>
+        <label for="request-file">Tải lên file:</label>
+        <input type="file" id="request-file" name="request-file" accept="image/*,application/pdf"/>
 
-        <button type="submit" style="margin-top: 10px; padding: 8px 16px;">Tạo yêu cầu</button>
+        <div class="submit-wrapper">
+          <button type="submit" class="submit-request-btn">Tạo yêu cầu</button>
+        </div>
       </form>
-      <button id="popup-close-create-request" class="popup-close_mc" style="margin-top: 10px; padding: 8px 16px;">Đóng</button>
     </div>
   `;
 

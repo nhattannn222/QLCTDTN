@@ -1,261 +1,363 @@
 .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .popup-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 500px;
-    max-width: 90%;
-    text-align: center;
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 500px;
+  max-width: 90%;
+  text-align: center;
 }
 
 .popup-content h3 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ad171c;
+  padding: 0 !important;
 }
 
 .popup-link-list {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 0;
-    list-style-type: none;
-    max-height: 300px;
-    overflow-y: auto;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  list-style-type: none;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .popup-link-list .link-item {
-    background-color: #f4f4f4;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    font-size: 18px;
-    color: #333;
-    transition: background-color 0.3s ease;
+  background-color: #f4f4f4;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+  transition: background-color 0.3s ease;
 }
 
 .popup-link-list .link-item:hover {
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 
 .popup-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+  display: flex;
+  justify-content:space-evenly;
+  margin-top: 20px;
 }
 
 .popup-buttons button {
-    padding: 12px 25px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 30%;
+  padding: 8px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 20%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.popup-save {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.popup-cancel {
-    background-color: #f44336;
-    color: white;
-}
-
-.popup-link-list .link-item.selected {
-    background-color: #4CAF50; /* Màu nền khi chọn */
-    color: white; /* Màu chữ khi chọn */
-}
-
-.popup-save:disabled {
-    background-color: #5f5454; /* Màu nền đen khi nút bị vô hiệu hóa */
-    color: #ccc; /* Màu chữ xám nhạt khi nút bị vô hiệu hóa */
-    cursor: not-allowed; /* Đổi con trỏ thành "không cho phép" */
-}
-
-.file-upload-section {
-    border-top: 1px solid #ccc;
-    padding-top: 10px;
-    margin-top: 10px;
-}
-
-.popup-upload {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.popup-upload:hover {
-    background-color: #45a049;
-}
-
-.no-scroll {
-    overflow: hidden;
-  }
-  
 .popup-delete {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 5px;
+background-color: rgb(162, 0, 0);
+color: white;
+border: none;
+padding: 8px 12px;
+cursor: pointer;
+border-radius: 5px;
 }
 
 .popup-delete:hover {
-    background-color: darkred;
+background-color: rgb(90, 10, 10);
+}
+
+.popup-save {
+  background-color: #4CAF50;
+  color: white;
+  width: 50px;
+}
+.popup-save:hover {
+background-color: #18641c;
+}
+
+.popup-link-list .link-item.selected {
+  background-color: #4CAF50; /* Màu nền khi chọn */
+  color: white; /* Màu chữ khi chọn */
+}
+
+.popup-save:disabled {
+  background-color: #5f5454; /* Màu nền đen khi nút bị vô hiệu hóa */
+  color: #ccc; /* Màu chữ xám nhạt khi nút bị vô hiệu hóa */
+  cursor: not-allowed; /* Đổi con trỏ thành "không cho phép" */
+}
+
+.file-upload-section {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  margin-top: 10px;
+  padding-left: 70px;
+  text-align: left;
+  justify-items: left;
+}
+
+.popup-upload {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.popup-upload:hover {
+  background-color: #45a049;
+}
+
+.no-scroll {
+  overflow: hidden;
 }
 
 
 /* Overlay mờ nền */
 .popup-overlay_mc {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  
-  /* Nội dung popup */
-  .popup-content_mc {
-    background: white;
-    padding: 20px;
-    width: 500px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    animation: fadeIn_mc 0.3s ease-in-out;
-  }
-  
-  /* Tiêu đề popup */
-  .popup-content_mc h3 {
-    margin-top: 0;
-    font-size: 24px;
-    text-align: center;
-  }
-  
-  /* Form trong popup */
-  .popup-form_mc {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  /* Nhãn */
-  .popup-form_mc label {
-    font-weight: bold;
-    font-size: 14px;
-  }
-  
-  
-  /* Textarea có thể thay đổi chiều cao */
-  .popup-input_mc[type="text"],
-  .popup-input_mc textarea {
-    resize: vertical;
-    min-height: 40px;
-  }
-
-  .popup-input_mc {
-    width: 100%; /* Đảm bảo full width */
-    min-height: 60px; /* Chiều cao tối thiểu */
-    max-height: 100px; /* Giới hạn chiều cao tối đa */
-    overflow-y: hidden; /* Ẩn thanh cuộn dọc */
-    resize: none; /* Không cho phép kéo thủ công */
-
-    /* BẮT BUỘC ĐỂ XUỐNG DÒNG */
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    word-break: break-word;
-    overflow-wrap: break-word;
-
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
-  
-  /* Nhóm nút bấm */
-  .popup-buttons_mc {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
+/* Nội dung popup */
+.popup-content_mc {
+  position: relative;
+  background: white;
+  padding: 20px;
+  width: 500px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  animation: fadeIn_mc 0.3s ease-in-out;
+
+  /* Thêm để có thanh cuộn khi nội dung tràn */
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Nút Close */
+.popup-close-circle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(173, 23, 28, 0.1);
+  color: #ad171c;
+  border: none;
+  border-radius: 50%;
+  font-size: 25px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+} 
+.popup-close-circle:hover {
+  background-color: #ad171c;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Tiêu đề popup */
+.popup-content_mc h3 {
+  margin-top: 0;
+  font-size: 24px;
+  text-align: center;
+  padding: 0 !important;
+  color: #ad171c;
+}
+
+.popup-content_mc table td {
+  font-size: 12px !important;
+  vertical-align: middle;
+}
+
+/* Form trong popup */
+.popup-form_mc {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Nhãn */
+.popup-form_mc label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+
+/* Textarea có thể thay đổi chiều cao */
+.popup-input_mc[type="text"],
+.popup-input_mc textarea {
+  resize: vertical;
+  min-height: 40px;
+}
+
+.popup-input_mc {
+  width: 100%; /* Đảm bảo full width */
+  min-height: 60px; /* Chiều cao tối thiểu */
+  max-height: 100px; /* Giới hạn chiều cao tối đa */
+  overflow-y: hidden; /* Ẩn thanh cuộn dọc */
+  resize: none; /* Không cho phép kéo thủ công */
+
+  /* BẮT BUỘC ĐỂ XUỐNG DÒNG */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+
+/* Nhóm nút bấm */
+.popup-buttons_mc {
+  display: flex;
+  justify-content:space-evenly;
+  margin-top: 15px;
+}
+
+/* Style chung cho các nút */
+.popup-buttons_mc button {
+  padding: 8px 25px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+/* Nút Lưu */
+.popup-save_mc {
+  background-color: #0b992c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+.popup-save_mc:hover {
+  background-color: #0f5a1f;
+  box-shadow: 0 6px 12px rgba(33, 136, 56, 0.25);
+}
+
+/* Nút Upload */
+.popup-upload_mc {
+  background: #1764ad;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+.popup-upload_mc:hover {
+  background: #052d76;
+  box-shadow: 0 6px 12px rgba(33, 136, 56, 0.25);
+}
+
+
+/* Form tạo yêu cầu*/
+#create-request-form {
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+#create-request-form textarea{
+justify-content: center;
+width: 97%;
+padding: 8px;
+border-radius: 6px;
+border: 1px solid #000000;
+font-family: inherit;
+font-size: 16px;
+}
+#create-request-form input[type="file"] {
+width: 50%;
+}
+/* Nút tạo yêu cầu */
+.submit-wrapper {
+display: flex;
+justify-content: center;
+margin-top: 10px;
+}
+.submit-request-btn {
+background-color: #ad171c;
+color: white;
+border: none;
+border-radius: 6px;
+padding: 10px 24px;
+font-size: 16px;
+cursor: pointer;
+transition: background-color 0.2s ease;
+}
+.submit-request-btn:hover {
+background-color: #760508;
+}
+
+/* Nút Xóa */
+.popup-delete_mc {
+  background: #dc3545;
+  color: white;
+}
+
+.popup-delete_mc:hover {
+  background: #7e101b;
+}
+
+/* Nút Hủy */
+.popup-cancel_mc {
+  background: #6c757d;
+  color: white;
+}
+
+.popup-cancel_mc:hover {
+  background: #5a6268;
+}
+/* Hiệu ứng fade-in */
+@keyframes fadeIn_mc {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
   }
-  
-  /* Style chung cho các nút */
-  .popup-buttons_mc button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.2s;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  /* Nút Lưu */
-  .popup-save_mc {
-    background: #28a745;
-    color: white;
-  }
-  
-  .popup-save_mc:hover {
-    background: #218838;
-  }
-  
-  /* Nút Xóa */
-  .popup-delete_mc {
-    background: #dc3545;
-    color: white;
-  }
-  
-  .popup-delete_mc:hover {
-    background: #c82333;
-  }
-  
-  /* Nút Hủy */
-  .popup-cancel_mc {
-    background: #6c757d;
-    color: white;
-  }
-  
-  .popup-cancel_mc:hover {
-    background: #5a6268;
-  }
-  
-  /* Hiệu ứng fade-in */
-  @keyframes fadeIn_mc {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  
+}
