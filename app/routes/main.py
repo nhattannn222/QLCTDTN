@@ -1,5 +1,5 @@
 # app/routes/main.py
-from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory
+from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, abort
 from app.services.data_service import fetch_tieu_chuan_data, getMaNganh, get_bctdg, fetch_minh_chung_bo_sung
 from config import Config
 import os
@@ -11,15 +11,27 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/<index>')
 def index(index):
     token = request.cookies.get('token')  # Lấy token từ cookie
-   
+
+    try:
+        index_int = int(index)
+    except ValueError:
+        abort(404)
+
     if token:
         ma_nganh = getMaNganh(token)
-        if ma_nganh == 0:
-            data = fetch_tieu_chuan_data(index)
-        else:
-            data = fetch_tieu_chuan_data(ma_nganh)  # Truyền token vào hàm nếu cần
+        
+        # Nếu ma_nganh khác index, chuyển hướng về đúng ngành từ token
+        if ma_nganh != 0 and ma_nganh != index_int:
+            return redirect(url_for('main.index', index=ma_nganh))
+        
+        # Nếu ma_nganh == 0 thì cho phép xem theo index bất kỳ
+        data = fetch_tieu_chuan_data(index_int if ma_nganh == 0 else ma_nganh)
     else:
-        data = fetch_tieu_chuan_data(index)
+        data = fetch_tieu_chuan_data(index_int)
+
+    if not data:  # Nếu không có dữ liệu, trả về 404
+        abort(404)
+
     return render_template('index.html', data=data, base_url=Config.BASE_URL)
 
 @main_bp.route('/login')
@@ -59,3 +71,8 @@ def mcbs(index):
 @main_bp.route('/uploads/img/<filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
+
+
+@main_bp.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404

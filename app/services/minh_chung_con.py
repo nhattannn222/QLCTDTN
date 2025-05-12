@@ -20,40 +20,57 @@ def update_link(ma_minh_chung_con, new_link):
 
     return minh_chung_con  # Trả về đối tượng minh_chung_con đã cập nhật
 
-def updateMC(ma_minh_chung_con, ten_minh_chung, so_minh_chung, ngay_ban_hanh, noi_ban_hanh):
+def updateMC(ma_minh_chung_con, ten_minh_chung, so_minh_chung, ngay_ban_hanh, noi_ban_hanh, url_hop_minh_chung):
     """
-    Cập nhật thông tin minh chứng con theo ID.
+    Cập nhật thông tin minh chứng con và gắn url_hop_minh_chung vào MinhChung cha.
     """
 
-    # Tìm minh_chung_con theo ID
+    # Tìm minh chứng con theo ID
     minh_chung_con = MinhChungCon.query.get(ma_minh_chung_con)
     if not minh_chung_con:
-        abort(404, description="Minh chứng con không tồn tại.")  # Nếu không tìm thấy, trả về lỗi 404
+        abort(404, description="Minh chứng con không tồn tại.")
 
-    # Cập nhật thông tin mới
+    # Cập nhật thông tin MinhChungCon
     minh_chung_con.ten_minh_chung = ten_minh_chung
     minh_chung_con.so_minh_chung = so_minh_chung
     minh_chung_con.ngay_ban_hanh = ngay_ban_hanh
     minh_chung_con.noi_ban_hanh = noi_ban_hanh
 
-    # Lưu thay đổi vào cơ sở dữ liệu
+    # Cập nhật url cho MinhChung cha (nếu tồn tại)
+    if minh_chung_con.minh_chung:
+        minh_chung_con.minh_chung.url = url_hop_minh_chung
+    else:
+        abort(400, description="Minh chứng con không gắn với Minh chứng cha nào.")
+
+    # Lưu thay đổi vào database
     db.session.commit()
 
-    return minh_chung_con  # Trả về đối tượng minh chứng con đã cập nhật
+    return minh_chung_con
+
 
 def getMC(ma_minh_chung_con):
     try:
         # Tìm minh chứng con theo ID
         minh_chung_con = MinhChungCon.query.get(ma_minh_chung_con)
-        
+
         # Nếu không tìm thấy, trả về lỗi 404
         if not minh_chung_con:
             abort(404, description='Minh chứng con không tồn tại')
 
-        # Trả về dữ liệu dưới dạng dictionary
-        return minh_chung_con.to_dict()
+        # Chuyển đối tượng MinhChungCon thành dict
+        result = minh_chung_con.to_dict()
+
+        # Gắn thêm url của MinhChung cha nếu có
+        if minh_chung_con.minh_chung:  # Quan hệ với MinhChung
+            result['url_hop_minh_chung'] = minh_chung_con.minh_chung.url
+        else:
+            result['url_hop_minh_chung'] = None
+
+        return result
+
     except Exception as e:
         abort(500, description=f'Lỗi server: {str(e)}')
+
 
 def deleteMC(ma_minh_chung_con):
 

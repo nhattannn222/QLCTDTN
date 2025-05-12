@@ -18,6 +18,12 @@ function showPopup(saveCallback, minhChungData) {
       <button class="popup-close-circle" id="popup-cancel_mc" ">×</button>
       <h3>Chỉnh sửa minh chứng</h3>
       <div class="popup-form_mc">
+        <label for="urlHopMinhChung_mc">URL Hộp minh chứng:</label>
+        <input type="text" id="urlHopMinhChung_mc" class="popup-input_mc" value="${
+          minhChungData.url_hop_minh_chung || ""
+        }">
+
+
         <label for="soMinhChungCon_mc">Số minh chứng:</label>
         <input type="text" id="soMinhChungCon_mc" class="popup-input_mc" value="${
           minhChungData.so_minh_chung || ""
@@ -56,6 +62,7 @@ function showPopup(saveCallback, minhChungData) {
       ten_minh_chung: document.getElementById("tenMinhChung_mc").value.trim(),
       ngay_ban_hanh: document.getElementById("ngayBanHanh_mc").value.trim(),
       noi_ban_hanh: document.getElementById("noiBanHanh_mc").value.trim(),
+      url_hop_minh_chung: document.getElementById("urlHopMinhChung_mc").value.trim(),
     };
 
     if (!updatedData.ten_minh_chung) {
@@ -146,7 +153,7 @@ export async function editMC(button) {
   }
 }
 
-async function updateMinhChung(data, updatedData) {
+async function updateMinhChung(data) {
   const token = getCookie("token");
   if (!token) {
     showMessage("Bạn chưa đăng nhập hoặc token không hợp lệ.", "error");
@@ -158,6 +165,8 @@ async function updateMinhChung(data, updatedData) {
       showMessage("Mã minh chứng con không hợp lệ!", "error");
       return;
     }
+    console.log(data);
+    
 
     const response = await fetch(
       `${baseUrl}/api/v1/minh_chung_con/${data.ma_minh_chung_con}`,
@@ -178,9 +187,9 @@ async function updateMinhChung(data, updatedData) {
     }
 
     showMessage("Cập nhật thành công!", "success");
-    setTimeout(() => {
-      location.reload();
-    });
+    // setTimeout(() => {
+    //   location.reload();
+    // });
     hidePopup();
   } catch (error) {
     console.error("Lỗi khi cập nhật minh chứng:", error);

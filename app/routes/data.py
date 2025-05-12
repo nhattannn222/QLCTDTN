@@ -333,6 +333,7 @@ def update_MC(ma_minh_chung_con):
     so_minh_chung = data['so_minh_chung'] 
     ngay_ban_hanh = data['ngay_ban_hanh']
     noi_ban_hanh = data['noi_ban_hanh']
+    url_hop_minh_chung = data['url_hop_minh_chung']
 
 
     # Kiểm tra xem dữ liệu có hợp lệ không
@@ -341,7 +342,7 @@ def update_MC(ma_minh_chung_con):
 
     try:
         # Gọi service để cập nhật link
-        updated_minh_chung_con = updateMC(ma_minh_chung_con, ten_minh_chung,so_minh_chung, ngay_ban_hanh, noi_ban_hanh)
+        updated_minh_chung_con = updateMC(ma_minh_chung_con, ten_minh_chung,so_minh_chung, ngay_ban_hanh, noi_ban_hanh, url_hop_minh_chung)
 
         # Kiểm tra xem bản ghi có được cập nhật không
         if not updated_minh_chung_con:
