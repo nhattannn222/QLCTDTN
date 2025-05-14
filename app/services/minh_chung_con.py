@@ -89,6 +89,25 @@ def deleteMC(ma_minh_chung_con):
         db.session.rollback()
         raise e  # Ném lỗi để xử lý phía trên
     
+def create_minh_chung(ma_minh_chung, so_thu_tu, ma_tieu_chi, url):
+    try:            
+        # Tạo MinhChungCon với thông tin đầy đủ
+        new_minh_chung = MinhChung(
+            ma_minh_chung=ma_minh_chung,
+            so_thu_tu=so_thu_tu,
+            ma_tieu_chi=ma_tieu_chi,
+            url=url
+        )
+
+        db.session.add(new_minh_chung)
+        db.session.commit()
+
+        return new_minh_chung.to_dict()
+
+    except Exception as e:
+        db.session.rollback()
+        return str(e)    
+    
 def create_minh_chung_con(ma_minh_chung, ten_minh_chung, so_minh_chung="", noi_ban_hanh="", ngay_ban_hanh=""):
     try:            
         # Tạo MinhChungCon với thông tin đầy đủ
