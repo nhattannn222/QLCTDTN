@@ -62,7 +62,9 @@ function showPopup(saveCallback, minhChungData) {
       ten_minh_chung: document.getElementById("tenMinhChung_mc").value.trim(),
       ngay_ban_hanh: document.getElementById("ngayBanHanh_mc").value.trim(),
       noi_ban_hanh: document.getElementById("noiBanHanh_mc").value.trim(),
-      url_hop_minh_chung: document.getElementById("urlHopMinhChung_mc").value.trim(),
+      url_hop_minh_chung: document
+        .getElementById("urlHopMinhChung_mc")
+        .value.trim(),
     };
 
     if (!updatedData.ten_minh_chung) {
@@ -159,14 +161,12 @@ async function updateMinhChung(data) {
     showMessage("Bạn chưa đăng nhập hoặc token không hợp lệ.", "error");
     return;
   }
+
   try {
-    // Kiểm tra nếu không có `so_minh_chung`, đặt mặc định là chuỗi rỗng
     if (!data.ma_minh_chung_con) {
       showMessage("Mã minh chứng con không hợp lệ!", "error");
       return;
     }
-    console.log(data);
-    
 
     const response = await fetch(
       `${baseUrl}/api/v1/minh_chung_con/${data.ma_minh_chung_con}`,
@@ -187,9 +187,36 @@ async function updateMinhChung(data) {
     }
 
     showMessage("Cập nhật thành công!", "success");
-    // setTimeout(() => {
-    //   location.reload();
-    // });
+
+    const row = document.querySelector(
+      `tr[data-ma-mc-con="${data.ma_minh_chung_con}"]`
+    );
+    if (row) {
+      const cells = row.querySelectorAll("td");
+
+      // Cập nhật và đánh dấu các ô bị thay đổi
+      if (cells.length >= 9) {
+        cells[3].textContent = data.ten_minh_chung;
+        cells[4].textContent = data.ngay_ban_hanh;
+        cells[5].textContent = data.noi_ban_hanh;
+
+        cells[2].classList.add("highlight-row");
+        cells[3].classList.add("highlight-row");
+        cells[4].classList.add("highlight-row");
+        cells[5].classList.add("highlight-row");
+      } else {
+        cells[1].textContent = data.ten_minh_chung;
+        cells[2].textContent = data.ngay_ban_hanh;
+        cells[3].textContent = data.noi_ban_hanh;
+
+        cells[0].classList.add("highlight-row");
+        cells[1].classList.add("highlight-row");
+        cells[2].classList.add("highlight-row");
+        cells[3].classList.add("highlight-row");
+      }
+
+    }
+
     hidePopup();
   } catch (error) {
     console.error("Lỗi khi cập nhật minh chứng:", error);

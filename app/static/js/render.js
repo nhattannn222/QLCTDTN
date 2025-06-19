@@ -152,6 +152,8 @@ export function renderTables(data) {
             if (minhChung.minh_chung_cons) {
               minhChung.minh_chung_cons.forEach((minhChungCon, index) => {
                 const minhChungConRow = document.createElement("tr");
+                minhChungConRow.setAttribute("data-ma-mc-con", minhChungCon.ma_minh_chung_con);
+
                 if (index === 0) {
                   const sttCell = document.createElement("td");
                   const minhChungConCodeCell = document.createElement("td");
